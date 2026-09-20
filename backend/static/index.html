@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vernacular AI Pedagogy Platform - Mother Tongue-Based Primary Education</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Ol+Chiki:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-warm: #FBF9F5;
+      --surface: #FFFFFF;
+      --surface-subtle: #F5EFE6;
+      --text-main: #27272A;
+      --text-muted: #71717A;
+      --primary: #854D0E;
+      --primary-hover: #713F12;
+      --primary-light: #FEF3C7;
+      --accent-green: #166534;
+      --accent-green-bg: #DCFCE7;
+      --accent-blue: #1E40AF;
+      --accent-blue-bg: #DBEAFE;
+      --border: #E4DFD7;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ol-chiki { font-family: 'Noto Sans Ol Chiki', sans-serif; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sync-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+      border: 1px solid #FDE68A;
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn-secondary {
+      background: var(--surface-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: #E9E1D5; }
+    .btn-green { background: var(--accent-green); }
+    .btn-green:hover { background: #14532D; }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+    .tab {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      background: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+    }
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      header { padding: 1rem; flex-direction: column; gap: 0.75rem; }
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #FFFFFF;
+      font-family: inherit;
+      font-size: 0.95rem;
+      margin-top: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .flashcard {
+      perspective: 1000px;
+      height: 220px;
+      cursor: pointer;
+    }
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+    .flashcard-front, .flashcard-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .flashcard-back {
+      background: var(--primary-light);
+      color: var(--primary-hover);
+      transform: rotateY(180deg);
+    }
+
+    .quiz-option {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .quiz-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      font-weight: 600;
+    }
+    .quiz-option.correct {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+    .quiz-option.incorrect {
+      border-color: #DC2626;
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .alert-info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
+    .alert-success { background: var(--accent-green-bg); border: 1px solid #86EFAC; color: var(--accent-green); }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: var(--surface);
+      padding: 2rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      max-width: 500px;
+      width: 90%;
+      box-shadow: var(--shadow);
+    }
+    .stat-card {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      font-weight: 600;
+    }
+    .lang-pill-btn {
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-pill-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+    .lang-pill-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 2px 4px rgba(180, 83, 9, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="brand-title" id="brandTitle">
+        <span>🏫</span>
+        <span>ᱵᱷᱟᱨᱱᱟᱠᱩᱞᱟᱨ ᱮ.ᱟᱭ. ᱟᱥᱲᱟ (Vernacular AI Platform)</span>
+      </div>
+      <div id="brandSubtitle" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+        ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱮᱛᱚᱦᱚᱵ ᱥᱮᱪᱮᱫ • ᱡᱮ-ᱜᱩᱨᱩᱡᱤ ᱟᱨ ᱮᱱ.ᱥᱤ.ᱤ.ᱟᱨ.ᱴᱤ (Jharkhand Primary Education • J-Guruji & NCERT)
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <!-- GLOBAL LANGUAGE SWITCHER BAR -->
+      <div id="headerLangSelector" style="display: flex; gap: 0.4rem; background: var(--surface-subtle); padding: 0.25rem 0.5rem; border-radius: 24px; border: 1px solid var(--border);">
+        <button class="lang-pill-btn active" id="btnLangSantali" onclick="setAppLanguage('Santali')" title="Santali (English)">ᱥᱟᱱᱛᱟᱲᱤ (Santali)</button>
+        <button class="lang-pill-btn" id="btnLangHindi" onclick="setAppLanguage('Hindi')" title="Hindi (English)">हिन्दी (Hindi)</button>
+        <button class="lang-pill-btn" id="btnLangEnglish" onclick="setAppLanguage('English')" title="English">English</button>
+      </div>
+
+      <div id="syncBadge" class="sync-status-badge" onclick="triggerSync()">
+        <span>🟢</span> <span id="syncText">Online • Synced</span>
+      </div>
+      <div id="userHeader" style="display: flex; align-items: center; gap: 0.6rem;">
+        <span id="userNameBadge" style="font-weight: 600; font-size: 0.95rem; color: var(--primary);">ᱵᱟᱢ ᱵᱚᱞᱚ ᱟᱠᱟᱱᱟ (Not Logged In)</span>
+        <button id="logoutBtn" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; display: none;" onclick="logout()">ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠ (Sign Out)</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- AUTH VIEW -->
+    <div id="authView" class="card" style="max-width: 540px; margin: 2rem auto;">
+      <!-- Language selection pill on Auth card for primary students -->
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Select Preferred Learning Language:</span>
+        <div style="display: inline-flex; gap: 0.4rem; background: var(--surface-subtle); padding: 0.3rem 0.6rem; border-radius: 20px; border: 1px solid var(--border);">
+          <button class="lang-pill-btn active" id="authLangSantali" onclick="setAppLanguage('Santali')">ᱥᱟᱱᱛᱟᱲᱤ (Santali)</button>
+          <button class="lang-pill-btn" id="authLangHindi" onclick="setAppLanguage('Hindi')">हिन्दी (Hindi)</button>
+          <button class="lang-pill-btn" id="authLangEnglish" onclick="setAppLanguage('English')">English</button>
+        </div>
+      </div>
+
+      <h2 id="authWelcomeTitle" style="margin-bottom: 0.3rem; text-align: center;">ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ (Welcome)</h2>
+      <p id="authWelcomeSub" style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
+        ᱟᱢᱟᱜ ᱮᱠᱟᱣᱩᱱᱴ ᱛᱮ ᱵᱚᱞᱚᱱ ᱢᱮ ᱥᱮ ᱱᱟᱶᱟ ᱩᱯᱨᱩᱢ ᱵᱮᱱᱟᱣ ᱢᱮ (Sign in or create account)
+      </p>
+
+      <div class="tabs" style="justify-content: center;">
+        <button class="tab active" id="tabTeacherRole" onclick="switchRole('teacher')">ᱢᱟᱪᱮᱛ ᱫᱩᱣᱟᱹᱨ (Teacher Portal)</button>
+        <button class="tab" id="tabStudentRole" onclick="switchRole('student')">ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱫᱩᱣᱟᱹᱨ (Student Portal)</button>
+      </div>
+
+      <!-- TEACHER AUTH -->
+      <div id="teacherAuthSection">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+          <button class="btn btn-secondary" id="btnTeacherToggleLogin" style="flex: 1;" onclick="setTeacherAuthMode('login')">Login</button>
+          <button class="btn btn-secondary" id="btnTeacherToggleReg" style="flex: 1;" onclick="setTeacherAuthMode('register')">New User (Register)</button>
+        </div>
+
+        <!-- Teacher Login Form -->
+        <div id="teacherLoginForm">
+          <label id="lblTeacherId">Teacher ID</label>
+          <input type="text" id="teacherIdInput" placeholder="Enter your Teacher ID">
+          <label id="lblTeacherPwd">Password</label>
+          <input type="password" id="teacherPwdInput" placeholder="Enter your password">
+          <button class="btn" id="btnLoginTeacher" style="width: 100%; justify-content: center;" onclick="loginTeacher()">Login as Teacher</button>
+        </div>
+
+        <!-- Teacher Register Form -->
+        <div id="teacherRegisterForm" style="display: none;">
+          <label id="lblRegTeacherName">Full Name</label>
+          <input type="text" id="regTeacherName" placeholder="e.g. Anita Kumar">
+          <label id="lblRegTeacherSchool">School / Institution</label>
+          <input type="text" id="regTeacherSchool" placeholder="e.g. Government Primary School">
+          <label id="lblRegTeacherId">Choose Teacher ID</label>
+          <input type="text" id="regTeacherId" placeholder="e.g. teacher_anita">
+          <label id="lblRegTeacherPwd">Password</label>
+          <input type="password" id="regTeacherPwd" placeholder="Create a secure password">
+          <label id="lblRegTeacherLang">Preferred Language</label>
+          <select id="regTeacherLang">
+            <option value="Santali (English)" selected>Santali (English)</option>
+            <option value="Hindi (English)">Hindi (English)</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+          </select>
+          <button class="btn btn-green" id="btnRegisterTeacher" style="width: 100%; justify-content: center;" onclick="registerTeacher()">Create Teacher Account</button>
+        </div>
+      </div>
+
+      <!-- STUDENT AUTH -->
+      <div id="studentAuthSection" style="display: none;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+          <button class="btn btn-secondary" id="btnStudentToggleLogin" style="flex: 1;" onclick="setStudentAuthMode('login')">Login</button>
+          <button class="btn btn-secondary" id="btnStudentToggleReg" style="flex: 1;" onclick="setStudentAuthMode('register')">New User (Register)</button>
+        </div>
+
+        <!-- Student Login Form -->
+        <div id="studentLoginForm">
+          <label id="lblStudentId">Student ID</label>
+          <input type="text" id="studentIdInput" placeholder="Enter your Student ID">
+          <label id="lblStudentPwd">Password</label>
+          <input type="password" id="studentPwdInput" placeholder="Enter your password">
+          <button class="btn btn-green" id="btnLoginStudent" style="width: 100%; justify-content: center;" onclick="loginStudent()">Login as Student</button>
+        </div>
+
+        <!-- Student Register Form -->
+        <div id="studentRegisterForm" style="display: none;">
+          <label id="lblRegStudentName">Full Name</label>
+          <input type="text" id="regStudentName" placeholder="e.g. Rahul">
+          <label id="lblRegStudentSchool">School / Institution</label>
+          <input type="text" id="regStudentSchool" placeholder="e.g. Government Primary School">
+          <label id="lblRegStudentId">Choose Student ID</label>
+          <input type="text" id="regStudentId" placeholder="e.g. rahul_c3">
+          <label id="lblRegStudentPwd">Password</label>
+          <input type="password" id="regStudentPwd" placeholder="Create a secure password">
+          <label id="lblRegStudentClass">Select Your Class / Grade</label>
+          <select id="regStudentClass">
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3" selected>Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+          </select>
+          <label id="lblRegStudentLang">Language Preference</label>
+          <select id="regStudentLang">
+            <option value="Santali (English)" selected>Santali (English)</option>
+            <option value="Hindi (English)">Hindi (English)</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+          </select>
+          <button class="btn btn-green" id="btnRegisterStudent" style="width: 100%; justify-content: center;" onclick="registerStudent()">Create Student Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEACHER PORTAL -->
+    <div id="teacherPortal" style="display: none;">
+      <div class="tabs">
+        <button class="tab active" id="tabTeacher_home" onclick="showTeacherSection('home')">Dashboard</button>
+        <button class="tab" id="tabTeacher_lessons" onclick="showTeacherSection('lessons')">My Lessons</button>
+        <button class="tab" id="tabTeacher_create" onclick="showTeacherSection('create')">Create Lesson</button>
+        <button class="tab" id="tabTeacher_upload" onclick="showTeacherSection('upload')">Upload Content</button>
+        <button class="tab" id="tabTeacher_translate" onclick="showTeacherSection('translate')">Translate</button>
+        <button class="tab" id="tabTeacher_voice" onclick="showTeacherSection('voice')">Voice Translation</button>
+        <button class="tab" id="tabTeacher_worksheets" onclick="showTeacherSection('worksheets')">Worksheets</button>
+        <button class="tab" id="tabTeacher_flashcards" onclick="showTeacherSection('flashcards')">Flashcards</button>
+        <button class="tab" id="tabTeacher_ai" onclick="showTeacherSection('ai')">AI Assistant</button>
+        <button class="tab" id="tabTeacher_offline" onclick="showTeacherSection('offline')">Offline Content</button>
+        <button class="tab" id="tabTeacher_sync" onclick="triggerSync()">Sync</button>
+        <button class="tab" id="tabTeacher_profile" onclick="openProfileModal()">Profile</button>
+        <button class="tab" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- TEACHER HOMEPAGE / DASHBOARD -->
+      <div id="secTeacherHome">
+        <div class="hero-card">
+          <h2 id="teacherHomeWelcome">Welcome Teacher</h2>
+          <div style="margin-top: 0.5rem; font-size: 0.95rem; color: #78350F; display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <span>Teacher ID: <strong id="teacherHomeId">-</strong></span>
+            <span>School: <strong id="teacherHomeSchool">-</strong></span>
+            <span>Language: <strong id="teacherHomeLang">English</strong></span>
+            <span class="sync-status-badge" id="teacherOnlineBadge" style="background: var(--accent-green-bg); color: var(--accent-green);">Online</span>
+          </div>
+          <p style="margin-top: 0.8rem; font-size: 0.9rem; color: #92400E;">
+            Deliver curriculum-grounded lessons to tribal students in their mother tongue (Santali / ᱚᱞ ᱪᱤᱠᱤ).
+            All syllabus items are strictly synchronized with <strong>J-Guruji Jharkhand</strong> standards.
+          </p>
+        </div>
+
+        <!-- REAL STATISTICS CARDS -->
+        <h3 style="margin-bottom: 0.8rem;">Statistics</h3>
+        <div class="grid-4" style="margin-bottom: 1.5rem;">
+          <div class="stat-card">
+            <div class="stat-num" id="statLessonsPrepared">0</div>
+            <div class="stat-label">Lessons Prepared</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color: #D97706;" id="statDrafts">0</div>
+            <div class="stat-label">Drafts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color: var(--accent-green);" id="statPublished">0</div>
+            <div class="stat-label">Published</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color: var(--accent-blue);" id="statPendingSync">0</div>
+            <div class="stat-label">Pending Sync</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 1.5rem;">
+          <div class="card" style="cursor: pointer;" onclick="showTeacherSection('create')">
+            <span style="font-size: 2rem;">📝</span>
+            <h4 style="margin-top: 0.5rem;">Create New Lesson</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">Select J-Guruji syllabus units and generate bilingual drafts.</p>
+          </div>
+          <div class="card" style="cursor: pointer;" onclick="showTeacherSection('upload')">
+            <span style="font-size: 2rem;">📄</span>
+            <h4 style="margin-top: 0.5rem;">Upload Document</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">Map external educational notes into verified syllabus chapters.</p>
+          </div>
+          <div class="card" style="cursor: pointer;" onclick="showTeacherSection('ai')">
+            <span style="font-size: 2rem;">✨</span>
+            <h4 style="margin-top: 0.5rem;">AI Pedagogical Assistant</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">Generate 5-question quizzes, flashcards, and printable worksheets.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEACHER: CREATE LESSON -->
+      <div id="secTeacherCreate" style="display: none;">
+        <div class="card">
+          <div class="alert alert-info">
+            <strong>Authoritative J-Guruji Hierarchy:</strong> Dropdowns are dynamically populated strictly from the imported J-Guruji Jharkhand syllabus database (Classes 1–5).
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Select Class</label>
+              <select id="teacherClassSelect" onchange="loadTeacherSubjects()">
+                <option value="1">Class 1</option>
+                <option value="2">Class 2</option>
+                <option value="3" selected>Class 3</option>
+                <option value="4">Class 4</option>
+                <option value="5">Class 5</option>
+              </select>
+
+              <label>Select Subject</label>
+              <select id="teacherSubjectSelect" onchange="loadTeacherChapters()">
+                <option>Loading subjects...</option>
+              </select>
+
+              <label>Select Chapter (J-Guruji)</label>
+              <select id="teacherChapterSelect" onchange="loadTeacherLessons()">
+                <option>Loading chapters...</option>
+              </select>
+
+              <label>Select Lesson / Topic</label>
+              <select id="teacherLessonSelect">
+                <option>Loading topics...</option>
+              </select>
+
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <button class="btn btn-secondary" onclick="generateLessonWithAI()">✨ Generate Grounded Draft</button>
+              </div>
+            </div>
+
+            <div>
+              <label>Lesson Title</label>
+              <input type="text" id="lessonTitleInput" placeholder="Enter lesson title">
+
+              <label>Lesson Content (Hindi / English)</label>
+              <textarea id="lessonContentInput" rows="5" placeholder="Enter core pedagogical explanation"></textarea>
+
+              <label>Santali (Mother Tongue) Translation</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <textarea id="lessonSantaliInput" rows="3" placeholder="Vernacular translation in Santali (Ol Chiki / Roman)"></textarea>
+                <button class="btn btn-secondary" style="height: 42px; margin-top: 6px;" onclick="speakSantaliAudio('lessonSantaliInput')">🔊 Listen</button>
+              </div>
+
+              <label>Classroom Activities & Examples</label>
+              <textarea id="lessonActivitiesInput" rows="3" placeholder="Practical activities for primary students"></textarea>
+
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary" onclick="saveTeacherLesson(false)">Save Draft</button>
+                <button class="btn btn-green" onclick="saveTeacherLesson(true)">🚀 Publish to Students</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEACHER: MY LESSONS -->
+      <div id="secTeacherLessons" style="display: none;">
+        <div class="card">
+          <h3>Published & Draft Lessons</h3>
+          <div id="teacherLessonsList" style="margin-top: 1rem;">
+            Loading lessons...
+          </div>
+        </div>
+      </div>
+
+      <!-- TEACHER: UPLOAD -->
+      <div id="secTeacherUpload" style="display: none;">
+        <div class="card">
+          <h3>Upload Curriculum Document</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            Upload PDF, DOCX, TXT or lesson notes. Content will be analyzed and strictly mapped to existing J-Guruji curriculum items.
+          </p>
+          <input type="file" id="teacherUploadFile">
+          <button class="btn" onclick="uploadDocument()">Upload & Map to J-Guruji</button>
+          <div id="uploadResult" style="margin-top: 1rem;"></div>
+        </div>
+      </div>
+
+      <!-- TEACHER: TRANSLATE -->
+      <div id="secTeacherTranslate" style="display: none;">
+        <div class="card">
+          <h3>Hindi / English → Santali Translation Core</h3>
+          <div class="grid-2">
+            <div>
+              <label>Source Language</label>
+              <select id="transSrcLang">
+                <option value="Hindi" selected>Hindi</option>
+                <option value="English">English</option>
+              </select>
+              <label>Input Text</label>
+              <textarea id="transInputText" rows="6" placeholder="Type words or pedagogical phrases (e.g. नमस्ते, आज हम गणित में जोड़ और घटाव सीखेंगे)"></textarea>
+              <button class="btn" onclick="performTranslation()">Translate Now</button>
+            </div>
+            <div>
+              <label>Target Language</label>
+              <select id="transTgtLang">
+                <option value="Santali" selected>Santali (ᱚᱞ ᱪᱤᱠᱤ / Ol Chiki)</option>
+                <option value="Ho">Ho (Future Extensible)</option>
+                <option value="Mundari">Mundari (Future Extensible)</option>
+              </select>
+              <label>Santali Translation Result</label>
+              <div id="transOutputText" class="card" style="background: var(--surface-subtle); min-height: 150px; font-size: 1.1rem; line-height: 1.6;">
+                Translation will appear here...
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                <div id="transStatus" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+                <button class="btn btn-green" onclick="speakSantaliDirect(document.getElementById('transOutputText').innerText)">🔊 Play Santali Audio</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEACHER: VOICE TRANSLATION -->
+      <div id="secTeacherVoice" style="display: none;">
+        <div class="card">
+          <h3>Real-Time Voice-to-Voice Translation Architecture</h3>
+          <div class="alert alert-info">
+            Pipeline: Teacher Speech &rarr; ASR (Speech-to-Text) &rarr; Translation Engine &rarr; Santali TTS Audio Synthesis.
+          </div>
+          <label>Speech Input Transcript</label>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <input type="text" id="voiceTextInput" value="नमस्ते बच्चों, आज हम विद्यालय में प्रकृति और पेड़ों के बारे में पढ़ेंगे।" style="margin-bottom: 0;">
+            <button class="btn btn-secondary" onclick="startTeacherSpeechInput()">🎙️ Speak</button>
+          </div>
+          <button class="btn" onclick="runVoiceTranslation()">Process Voice Pipeline</button>
+          <div id="voiceResult" style="margin-top: 1.5rem;"></div>
+        </div>
+      </div>
+
+      <!-- TEACHER: AI ASSISTANT -->
+      <div id="secTeacherAI" style="display: none;">
+        <div class="card">
+          <h3>Curriculum-Grounded AI Assistant</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            Generate grounded Worksheets, 5-Question Quizzes, and Bilingual Flashcards bound strictly to J-Guruji syllabus units.
+          </p>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <button class="btn" onclick="generateQuizForLesson()">Generate 5-Question Quiz</button>
+            <button class="btn btn-secondary" onclick="generateFlashcardsForLesson()">Generate Flashcards</button>
+            <button class="btn btn-secondary" onclick="generateWorksheetForLesson()">Generate Worksheet</button>
+          </div>
+          <div id="aiOutputArea"></div>
+        </div>
+      </div>
+
+      <!-- TEACHER: OFFLINE CONTENT -->
+      <div id="secTeacherOffline" style="display: none;">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Offline Local Storage & Cache Management</h3>
+            <span class="sync-status-badge" style="background: var(--accent-green-bg); color: var(--accent-green);">Local SQLite & Web Storage Active</span>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            Teachers can author lessons, browse cached J-Guruji chapters, and prepare worksheets without active internet connectivity. All modifications queue automatically for cloud synchronization.
+          </p>
+          <div class="grid-3" style="margin-bottom: 1rem;">
+            <div class="card" style="background: var(--surface-subtle);">
+              <h4>Cached Lessons</h4>
+              <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;" id="cachedLessonsCount">0</p>
+            </div>
+            <div class="card" style="background: var(--surface-subtle);">
+              <h4>Queued Offline Actions</h4>
+              <p style="font-size: 1.5rem; font-weight: 700; color: #D97706; margin-top: 0.5rem;" id="queuedActionsCount">0</p>
+            </div>
+            <div class="card" style="background: var(--surface-subtle);">
+              <h4>Storage Engine</h4>
+              <p style="font-size: 1rem; font-weight: 600; color: var(--accent-green); margin-top: 0.5rem;">IndexedDB / LocalStorage</p>
+            </div>
+          </div>
+          <button class="btn" onclick="triggerSync()">Run Cloud Synchronization Now</button>
+        </div>
+      </div>
+
+      <!-- TEACHER: WORKSHEETS -->
+      <div id="secTeacherWorksheets" style="display: none;">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Bilingual Mother-Tongue Worksheets</h3>
+            <button class="btn btn-green" onclick="window.print()">🖨️ Export as PDF / Print</button>
+          </div>
+          <div id="worksheetDisplay">Click 'Generate Worksheet' in AI Assistant or create one from J-Guruji topics.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT PORTAL -->
+    <div id="studentPortal" style="display: none;">
+      <div class="tabs">
+        <button class="tab active" id="tabStudent_home" onclick="showStudentSection('home')">Dashboard</button>
+        <button class="tab" id="tabStudent_learn" onclick="showStudentSection('learn')">Continue Learning</button>
+        <button class="tab" id="tabStudent_subjects" onclick="showStudentSection('subjects')">Subjects</button>
+        <button class="tab" id="tabStudent_progress" onclick="showStudentSection('progress')">Progress</button>
+        <button class="tab" id="tabStudent_doubts" onclick="showStudentSection('doubts')">Ask Doubt</button>
+        <button class="tab" id="tabStudent_downloads" onclick="showStudentSection('downloads')">Downloads</button>
+        <button class="tab" id="tabStudent_quiz" onclick="showStudentSection('quiz')">Quiz</button>
+        <button class="tab" id="tabStudent_flashcards" onclick="showStudentSection('flashcards')">Flashcards</button>
+        <button class="tab" id="tabStudent_sync" onclick="triggerSync()">Sync</button>
+        <button class="tab" id="tabStudent_profile" onclick="openProfileModal()">Profile</button>
+        <button class="tab" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- STUDENT HOMEPAGE / DASHBOARD -->
+      <div id="secStudentHome">
+        <div class="hero-card">
+          <h2 id="studentHomeWelcome">Welcome Student</h2>
+          <div style="margin-top: 0.5rem; font-size: 0.95rem; color: #78350F; display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <span>Grade: <strong id="studentHomeClass">Class 3</strong></span>
+            <span>School: <strong id="studentHomeSchool">Government Primary School</strong></span>
+            <span>Language: <strong id="studentHomeLang">Santali (English)</strong></span>
+            <span class="sync-status-badge" id="studentOnlineBadge" style="background: var(--accent-green-bg); color: var(--accent-green);">Online</span>
+          </div>
+          <p style="margin-top: 0.8rem; font-size: 0.9rem; color: #92400E;">
+            Welcome to your digital classroom. Learn foundational subjects in your mother tongue with lessons, spoken audio, flashcards, and quizzes.
+          </p>
+        </div>
+
+        <h3 style="margin-bottom: 0.8rem;">Classroom Navigation</h3>
+        <div class="grid-4" style="margin-bottom: 1.5rem;">
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('learn')">
+            <span style="font-size: 2.2rem;">📖</span>
+            <h4 style="margin-top: 0.5rem;">Continue Learning</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Resume active lesson with audio</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('subjects')">
+            <span style="font-size: 2.2rem;">📚</span>
+            <h4 style="margin-top: 0.5rem;">Subjects</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">J-Guruji textbooks & chapters</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('quiz')">
+            <span style="font-size: 2.2rem;">📝</span>
+            <h4 style="margin-top: 0.5rem;">Interactive Quiz</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">5 grounded syllabus questions</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('flashcards')">
+            <span style="font-size: 2.2rem;">🗂️</span>
+            <h4 style="margin-top: 0.5rem;">Flashcards</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Santali mother tongue vocabulary</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('doubts')">
+            <span style="font-size: 2.2rem;">💡</span>
+            <h4 style="margin-top: 0.5rem;">Ask Doubt</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Voice & AI assistant with TTS</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('progress')">
+            <span style="font-size: 2.2rem;">📊</span>
+            <h4 style="margin-top: 0.5rem;">Progress</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Scores, quizzes & lessons</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="showStudentSection('downloads')">
+            <span style="font-size: 2.2rem;">💾</span>
+            <h4 style="margin-top: 0.5rem;">Downloads</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Offline cached lessons</p>
+          </div>
+          <div class="card" style="cursor: pointer; text-align: center; padding: 1.2rem; transition: transform 0.15s ease;" onclick="triggerSync()">
+            <span style="font-size: 2.2rem;">🔄</span>
+            <h4 style="margin-top: 0.5rem;">Cloud Sync</h4>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Synchronize with server</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT: CONTINUE LEARNING -->
+      <div id="secStudentLearn" style="display: none;">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <span class="sync-status-badge" id="studentClassBadge" style="background: var(--primary-light); color: var(--primary-hover);">Class 3</span>
+              <h2 id="activeLessonTitle" style="margin-top: 0.4rem;">Counting & Numbers</h2>
+              <p id="activeLessonBreadcrumb" style="color: var(--text-muted); font-size: 0.85rem;">Mathematics &bull; Chapter 1 &bull; Source: J-Guruji Jharkhand</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span id="audioPlayingStatus" style="display: none; color: var(--accent-green); font-weight: 600; font-size: 0.85rem; padding: 0.3rem 0.6rem; background: var(--accent-green-bg); border-radius: 6px;">🔊 Playing Audio...</span>
+              <button class="btn btn-secondary" onclick="downloadActiveLesson()">💾 Download Offline</button>
+              <button class="btn btn-green" onclick="speakCurrentLesson()">🔊 Play Audio (Santali)</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem;">
+            <div>
+              <h4 style="margin-bottom: 0.5rem;">Lesson Explanation (Hindi / English):</h4>
+              <div id="activeLessonBody" class="card" style="background: var(--surface-subtle); line-height: 1.6;">
+                Loading lesson content...
+              </div>
+
+              <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Mother Tongue Content (Santali &bull; ᱚᱞ ᱪᱤᱠᱤ):</h4>
+              <div id="activeLessonSantali" class="card" style="background: var(--primary-light); color: #78350F; line-height: 1.6; font-size: 1.05rem;">
+                ᱡᱚᱦᱟᱨ! ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱠᱚ ᱞᱟᱹᱜᱤᱫ ᱥᱟᱱᱛᱟᱲᱤ ᱛᱮ ᱯᱟᱲᱦᱟᱣ...
+              </div>
+
+              <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Classroom Activities & Local Context:</h4>
+              <div id="activeLessonActivities" class="card" style="background: var(--surface-subtle); line-height: 1.5; font-size: 0.9rem;">
+                Curriculum activities and local Jharkhand examples will appear here.
+              </div>
+            </div>
+
+            <div>
+              <h4>Lesson Quick Tools</h4>
+              <div class="card" style="margin-top: 0.5rem;">
+                <button class="btn" style="width: 100%; margin-bottom: 0.5rem; justify-content: center;" onclick="showStudentSection('quiz')">📝 Take 5-Question Quiz</button>
+                <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem; justify-content: center;" onclick="showStudentSection('flashcards')">🗂️ View Flashcards</button>
+                <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="showStudentSection('doubts')">❓ Ask AI Doubt Assistant</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT: BROWSE CURRICULUM -->
+      <div id="secStudentSubjects" style="display: none;">
+        <div class="card">
+          <h3>Authoritative J-Guruji Subjects & Chapters</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            Browse official textbooks and chapters for your specific class from J-Guruji Jharkhand.
+          </p>
+          <div id="studentSubjectsGrid" class="grid-3">Loading subjects...</div>
+        </div>
+      </div>
+
+      <!-- STUDENT: QUIZ -->
+      <div id="secStudentQuiz" style="display: none;">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Interactive Topic Quiz (Minimum 5 Questions)</h3>
+            <span id="quizScoreBadge" class="sync-status-badge" style="background: var(--primary-light); color: var(--primary-hover);">Score: 0 / 5</span>
+          </div>
+          <div id="quizContainer">
+            Click 'Reset / Retry' to load your class quiz questions.
+          </div>
+          <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
+            <button id="submitQuizBtn" class="btn btn-green" onclick="submitQuizAnswers()">Submit Quiz Answers</button>
+            <button class="btn btn-secondary" onclick="loadLessonQuiz()">Reset / Retry</button>
+          </div>
+          <div id="quizFinalResult" style="margin-top: 1rem;"></div>
+        </div>
+      </div>
+
+      <!-- STUDENT: FLASHCARDS -->
+      <div id="secStudentFlashcards" style="display: none;">
+        <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Mother Tongue Flashcards</h3>
+            <span id="cardCounter" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Card 1 of 5</span>
+          </div>
+
+          <div class="flashcard" onclick="flipCard()">
+            <div class="flashcard-inner" id="flashcardInner">
+              <div class="flashcard-front">
+                <span style="font-size: 0.85rem; color: var(--text-muted);" id="fcCategory">Category</span>
+                <h2 id="fcFront" style="margin-top: 1rem;">Front Text</h2>
+                <span style="font-size: 0.8rem; color: var(--primary); margin-top: 1.5rem;">(Tap to flip)</span>
+              </div>
+              <div class="flashcard-back">
+                <span style="font-size: 0.85rem;" id="fcCategoryBack">Santali Translation</span>
+                <h2 id="fcBack" style="margin-top: 1rem;" class="ol-chiki">Back Text</h2>
+                <span style="font-size: 0.8rem; margin-top: 1.5rem;">(Tap to flip back)</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+            <button class="btn btn-secondary" onclick="prevCard()">⬅️ Previous</button>
+            <button class="btn btn-secondary" onclick="speakSantaliDirect(document.getElementById('fcBack').innerText)">🔊 Speak Card</button>
+            <button class="btn" onclick="nextCard()">Next ➡️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT: DOUBTS -->
+      <div id="secStudentDoubts" style="display: none;">
+        <div class="card">
+          <h3>Curriculum Doubt Assistant</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            Ask any question regarding your current lesson. The assistant responds with personalized explanations grounded in your syllabus.
+          </p>
+          <label>Type or Speak Your Doubt</label>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <input type="text" id="studentDoubtInput" placeholder="e.g. संख्या को संथाली में कैसे गिनते हैं?" style="margin-bottom: 0;">
+            <button class="btn btn-secondary" onclick="startStudentSpeechInput()">🎙️ Speak Doubt</button>
+            <button class="btn btn-green" onclick="askDoubt()">Ask AI</button>
+          </div>
+          <div id="doubtResponseArea"></div>
+        </div>
+      </div>
+
+      <!-- STUDENT: DOWNLOADS (OFFLINE CONTENT) -->
+      <div id="secStudentDownloads" style="display: none;">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h3>Offline Digital Classroom Storage</h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem;">Offline lessons, worksheets, flashcards, and quizzes available without active internet.</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-secondary" onclick="loadDownloadedLessons()">🔄 Refresh Storage</button>
+              <button class="btn btn-green" onclick="triggerSync()">🔄 Synchronize</button>
+            </div>
+          </div>
+
+          <div class="tabs" style="margin-bottom: 1rem;">
+            <button class="tab active" id="tabDlLessons" onclick="switchDownloadTab('lessons')">📖 Saved Lessons (<span id="dlLessonsCount">0</span>)</button>
+            <button class="tab" id="tabDlQuizzes" onclick="switchDownloadTab('quizzes')">🎯 Offline Quizzes (<span id="dlQuizzesCount">0</span>)</button>
+            <button class="tab" id="tabDlWorksheets" onclick="switchDownloadTab('worksheets')">📝 Worksheets (<span id="dlWorksheetsCount">0</span>)</button>
+          </div>
+
+          <div id="viewDlLessons">
+            <div id="downloadedLessonsList">
+              <p style="color: var(--text-muted);">No offline lessons downloaded yet. Open any textbook chapter and click '💾 Download Offline'.</p>
+            </div>
+          </div>
+
+          <div id="viewDlQuizzes" style="display: none;">
+            <div id="downloadedQuizzesList">
+              <p style="color: var(--text-muted);">Sync or practice quizzes to cache offline question sets.</p>
+            </div>
+          </div>
+
+          <div id="viewDlWorksheets" style="display: none;">
+            <div id="downloadedWorksheetsList">
+              <p style="color: var(--text-muted);">No offline worksheets cached yet. Run Sync to pull recent class worksheets.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT: PROGRESS -->
+      <div id="secStudentProgress" style="display: none;">
+        <div class="card">
+          <h3>Your Learning Journey & Performance</h3>
+          <div class="grid-3" style="margin: 1.5rem 0;">
+            <div class="card" style="background: var(--surface-subtle); text-align: center;">
+              <span style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="progLessonsCount">0</span>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Lessons Completed</p>
+            </div>
+            <div class="card" style="background: var(--surface-subtle); text-align: center;">
+              <span style="font-size: 2rem; font-weight: 700; color: var(--accent-green);" id="progQuizzesCount">0</span>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Quizzes Taken</p>
+            </div>
+            <div class="card" style="background: var(--surface-subtle); text-align: center;">
+              <span style="font-size: 2rem; font-weight: 700; color: var(--accent-blue);" id="progAvgScore">0%</span>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Average Quiz Score</p>
+            </div>
+          </div>
+          <button class="btn" onclick="triggerSync()">Sync Progress Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = (window.location.protocol.startsWith('http') && window.location.port !== '') 
+      ? window.location.origin 
+      : 'http://127.0.0.1:8000';
+    let currentUser = null;
+    let currentGrade = 3;
+    let currentLessonId = 1;
+    let currentQuizData = null;
+    let studentAnswers = {};
+    let flashcardsList = [];
+    let currentCardIndex = 0;
+    const globalAudioPlayer = new Audio();
+
+    let currentAppLanguage = localStorage.getItem('vernacular_pref_lang') || 'Santali';
+    let localizationCache = null;
+
+    // Built-in Comprehensive Localization Dictionary (Santali Ol Chiki + English brackets, Hindi + English brackets, English)
+    const UI_STRINGS = {
+      "Santali": {
+        "brand_title": "ᱵᱷᱟᱨᱱᱟᱠᱩᱞᱟᱨ ᱮ.ᱟᱭ. ᱟᱥᱲᱟ (Vernacular AI Platform)",
+        "brand_subtitle": "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱮᱛᱚᱦᱚᱵ ᱥᱮᱪᱮᱫ • ᱡᱮ-ᱜᱩᱨᱩᱡᱤ ᱟᱨ ᱮᱱ.ᱥᱤ.ᱤ.ᱟᱨ.ᱴᱤ (Jharkhand Primary Education • J-Guruji & NCERT)",
+        "online_status": "🟢 ᱚᱱᱞᱟᱭᱤᱱ • ᱥᱤᱝᱠ ᱟᱠᱟᱱᱟ (Online • Synced)",
+        "offline_status": "🟡 ᱚᱯᱷᱞᱟᱭᱤᱱ ᱢᱳᱰ (Offline Mode Active)",
+        "not_logged_in": "ᱵᱟᱢ ᱵᱚᱞᱚ ᱟᱠᱟᱱᱟ (Not Logged In)",
+        "welcome_user": "ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ, {name} (Welcome, {name})",
+        "sign_out": "ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠ (Sign Out)",
+        "auth_welcome_title": "ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ (Welcome)",
+        "auth_welcome_sub": "ᱟᱢᱟᱜ ᱮᱠᱟᱣᱩᱱᱴ ᱛᱮ ᱵᱚᱞᱚᱱ ᱢᱮ ᱥᱮ ᱱᱟᱶᱟ ᱩᱯᱨᱩᱢ ᱵᱮᱱᱟᱣ ᱢᱮ (Sign in or create account)",
+        "teacher_portal_tab": "ᱢᱟᱪᱮᱛ ᱫᱩᱣᱟᱹᱨ (Teacher Portal)",
+        "student_portal_tab": "ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱫᱩᱣᱟᱹᱨ (Student Portal)",
+        "login_btn_tab": "ᱵᱚᱞᱚᱱ (Login)",
+        "register_btn_tab": "ᱱᱟᱶᱟ ᱵᱮᱵᱷᱟᱨᱤᱭᱟᱹ (Register)",
+        "teacher_id_label": "ᱢᱟᱪᱮᱛ ᱩᱯᱨᱩᱢ ᱮᱞ (Teacher ID)",
+        "student_id_label": "ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱩᱯᱨᱩᱢ ᱮᱞ (Student ID)",
+        "password_label": "ᱫᱟᱱᱟᱝ ᱥᱟᱵᱟᱫ (Password)",
+        "full_name_label": "ᱯᱩᱨᱟᱹ ᱧᱩᱛᱩᱢ (Full Name)",
+        "school_label": "ᱟᱥᱲᱟ / ᱜᱟᱶᱛᱟ (School / Institution)",
+        "class_label": "ᱪᱟᱱᱟᱪ / ᱛᱷᱚᱠ (Class / Grade)",
+        "lang_pref_label": "ᱠᱩᱥᱤᱭᱟᱜ ᱯᱟᱹᱨᱥᱤ (Preferred Language)",
+        "login_teacher_btn": "ᱢᱟᱪᱮᱛ ᱞᱮᱠᱟᱛᱮ ᱵᱚᱞᱚᱱ (Login as Teacher)",
+        "register_teacher_btn": "ᱢᱟᱪᱮᱛ ᱮᱠᱟᱣᱩᱱᱴ ᱵᱮᱱᱟᱣ (Create Teacher Account)",
+        "login_student_btn": "ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱞᱮᱠᱟᱛᱮ ᱵᱚᱞᱚᱱ (Login as Student)",
+        "register_student_btn": "ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱮᱠᱟᱣᱩᱱᱴ ᱵᱮᱱᱟᱣ (Create Student Account)",
+        "dashboard_tab": "ᱰᱮᱥᱵᱳᱨᱰ (Dashboard)",
+        "learn_tab": "ᱪᱮᱫᱚᱜ ᱢᱮ (Continue Learning)",
+        "subjects_tab": "ᱥᱟᱛᱟᱢ ᱠᱚ (Subjects)",
+        "progress_tab": "ᱞᱟᱦᱟᱱᱛᱤ (Progress)",
+        "doubts_tab": "ᱠᱩᱠᱞᱤ ᱠᱩᱞᱤᱭᱮ (Ask Doubt)",
+        "downloads_tab": "ᱰᱟᱣᱩᱱᱞᱳᱰ ᱠᱚ (Downloads)",
+        "quiz_tab": "ᱠᱩᱠᱞᱤ ᱛᱮᱞᱟ (Quiz)",
+        "flashcards_tab": "ᱯᱷᱞᱮᱥᱠᱟᱨᱰ (Flashcards)",
+        "sync_tab": "ᱥᱤᱝᱠ (Sync)",
+        "profile_tab": "ᱩᱯᱨᱩᱢ (Profile)",
+        "logout_tab": "ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠ (Logout)",
+        "my_lessons_tab": "ᱤᱧᱟᱜ ᱯᱟᱲᱦᱟᱣ (My Lessons)",
+        "create_lesson_tab": "ᱱᱟᱶᱟ ᱯᱟᱲᱦᱟᱣ ᱵᱮᱱᱟᱣ (Create Lesson)",
+        "upload_content_tab": "ᱯᱩᱛᱷᱤ ᱞᱟᱫᱮ (Upload Content)",
+        "translate_tab": "ᱛᱚᱨᱡᱚᱢᱟ (Translate)",
+        "voice_tab": "ᱨᱚᱲ ᱛᱚᱨᱡᱚᱢᱟ (Voice Translation)",
+        "worksheets_tab": "ᱠᱟᱹᱢᱤ ᱥᱟᱠᱟᱢ (Worksheets)",
+        "ai_assistant_tab": "ᱮ.ᱟᱭ. ᱜᱚᱲᱚᱭᱤᱡ (AI Assistant)",
+        "offline_content_tab": "ᱚᱯᱷᱞᱟᱭᱤᱱ ᱥᱟᱯᱟᱵ (Offline Content)",
+        "student_home_welcome": "ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ ᱯᱟᱹᱴᱷᱩᱣᱟᱹ (Welcome Student)",
+        "classroom_nav_title": "ᱟᱥᱲᱟ ᱥᱮᱱᱚᱜ ᱦᱚᱨ (Classroom Navigation)",
+        "continue_learning_desc": "ᱟᱢᱟᱜ ᱯᱟᱲᱦᱟᱣ ᱟᱲᱟᱝ ᱥᱟᱶᱛᱮ ᱞᱟᱦᱟᱭ ᱢᱮ (Resume active lesson with audio)",
+        "subjects_desc": "ᱡᱮ-ᱜᱩᱨᱩᱡᱤ ᱯᱩᱛᱷᱤ ᱟᱨ ᱦᱟᱹᱴᱤᱧ ᱠᱚ (J-Guruji textbooks & chapters)",
+        "quiz_desc": "᱕ ᱜᱚᱴᱟᱝ ᱥᱟᱛᱟᱢ ᱠᱩᱠᱞᱤ ᱠᱚ (5 grounded syllabus questions)",
+        "flashcards_desc": "ᱥᱟᱱᱛᱟᱲᱤ ᱟᱹᱲᱟᱹ ᱢᱩᱨᱟᱹᱭ ᱠᱟᱨᱰ ᱠᱚ (Santali vocabulary flip cards)",
+        "doubts_desc": "ᱨᱚᱲ ᱟᱨ ᱮ.ᱟᱭ. ᱜᱚᱲᱚ ᱟᱲᱟᱝ ᱥᱟᱶ (Voice & AI doubt assistant with audio)",
+        "progress_desc": "ᱮᱞ, ᱠᱩᱠᱞᱤ ᱟᱨ ᱯᱟᱲᱦᱟᱣ ᱦᱟᱞᱚᱛ (Scores, quizzes & lessons progress)",
+        "downloads_desc": "ᱚᱯᱷᱞᱟᱭᱤᱱ ᱥᱟᱺᱪᱟᱣ ᱯᱟᱲᱦᱟᱣ ᱠᱚ (Offline saved lessons & materials)",
+        "sync_desc": "ᱥᱟᱨᱵᱷᱟᱨ ᱥᱟᱶ ᱡᱚᱲᱟᱣ ᱢᱮ (Synchronize with cloud server)",
+        "play_audio_btn": "🔊 ᱥᱟᱱᱛᱟᱲᱤ ᱛᱮ ᱟᱧᱡᱚᱢ ᱢᱮ (Play Audio)",
+        "download_offline_btn": "💾 ᱚᱯᱷᱞᱟᱭᱤᱱ ᱫᱚᱦᱚᱭ ᱢᱮ (Download Offline)",
+        "take_quiz_btn": "📝 ᱕-ᱠᱩᱠᱞᱤ ᱛᱮᱞᱟ ᱮᱢ ᱢᱮ (Take 5-Question Quiz)",
+        "view_flashcards_btn": "🗂️ ᱯᱷᱞᱮᱥᱠᱟᱨᱰ ᱧᱮᱞ ᱢᱮ (View Flashcards)",
+        "ask_ai_btn": "❓ ᱮ.ᱟᱭ. ᱠᱩᱠᱞᱤ ᱠᱩᱞᱤᱭᱮ (Ask AI Assistant)",
+        "speak_doubt_btn": "🎙️ ᱨᱚᱲ ᱠᱟᱛᱮ ᱠᱩᱞᱤᱭᱮ (Speak Doubt)",
+        "lesson_explanation_hdr": "ᱯᱟᱲᱦᱟᱣ ᱵᱩᱡᱷᱟᱹᱣ (Hindi / English Lesson Explanation):",
+        "mother_tongue_hdr": "ᱟᱭᱳ ᱟᱲᱟᱝ ᱛᱮ ᱯᱟᱲᱦᱟᱣ (Mother Tongue Content • Santali ᱚᱞ ᱪᱤᱠᱤ):",
+        "activities_hdr": "ᱟᱥᱲᱟ ᱠᱟᱹᱢᱤᱦᱚᱨᱟ ᱟᱨ ᱫᱟᱹᱭᱠᱟᱹ (Classroom Activities & Local Examples):",
+        "quiz_header": "ᱥᱟᱛᱟᱢ ᱠᱩᱠᱞᱤ ᱛᱮᱞᱟ (Interactive Topic Quiz - Minimum 5 Questions)",
+        "submit_quiz_btn": "ᱠᱩᱠᱞᱤ ᱛᱮᱞᱟ ᱫᱟᱠᱷᱤᱞ ᱢᱮ (Submit Quiz Answers)",
+        "reset_quiz_btn": "ᱫᱚᱦᱲᱟ ᱮᱦᱚᱵ (Reset / Retry)",
+        "flashcard_header": "ᱟᱭᱳ ᱟᱲᱟᱝ ᱯᱷᱞᱮᱥᱠᱟᱨᱰ (Mother Tongue Flashcards)",
+        "speak_card_btn": "🔊 ᱠᱟᱨᱰ ᱟᱧᱡᱚᱢ ᱢᱮ (Speak Card)",
+        "next_btn": "ᱞᱟᱦᱟ ➡️ (Next)",
+        "prev_btn": "⬅️ ᱛᱟᱭᱚᱢ (Previous)"
+      },
+      "Hindi": {
+        "brand_title": "मातृभाषा ए.आई. शिक्षा मंच (Vernacular AI Platform)",
+        "brand_subtitle": "झारखंड प्राथमिक शिक्षा • जे-गुरुजी और एनसीईआरटी (Jharkhand Primary Education • J-Guruji & NCERT)",
+        "online_status": "🟢 ऑनलाइन • सिंक संपन्न (Online • Synced)",
+        "offline_status": "🟡 ऑफ़लाइन मोड (Offline Mode Active)",
+        "not_logged_in": "लॉग इन नहीं हैं (Not Logged In)",
+        "welcome_user": "स्वागत है, {name} (Welcome, {name})",
+        "sign_out": "साइन आउट (Sign Out)",
+        "auth_welcome_title": "स्वागत है (Welcome)",
+        "auth_welcome_sub": "अपने खाते से लॉग इन करें या नया प्रोफ़ाइल बनाएं (Sign in or create account)",
+        "teacher_portal_tab": "शिक्षक पोर्टल (Teacher Portal)",
+        "student_portal_tab": "छात्र पोर्टल (Student Portal)",
+        "login_btn_tab": "लॉग इन (Login)",
+        "register_btn_tab": "नया खाता (Register)",
+        "teacher_id_label": "शिक्षक पहचान संख्या (Teacher ID)",
+        "student_id_label": "छात्र पहचान संख्या (Student ID)",
+        "password_label": "पासवर्ड (Password)",
+        "full_name_label": "पूरा नाम (Full Name)",
+        "school_label": "विद्यालय / संस्था (School / Institution)",
+        "class_label": "कक्षा / श्रेणी (Class / Grade)",
+        "lang_pref_label": "पसंदीदा भाषा (Preferred Language)",
+        "login_teacher_btn": "शिक्षक के रूप में लॉग इन करें (Login as Teacher)",
+        "register_teacher_btn": "शिक्षक खाता बनाएं (Create Teacher Account)",
+        "login_student_btn": "छात्र के रूप में लॉग इन करें (Login as Student)",
+        "register_student_btn": "छात्र खाता बनाएं (Create Student Account)",
+        "dashboard_tab": "डैशबोर्ड (Dashboard)",
+        "learn_tab": "सीखना जारी रखें (Continue Learning)",
+        "subjects_tab": "विषय (Subjects)",
+        "progress_tab": "प्रगति (Progress)",
+        "doubts_tab": "संदेह पूछें (Ask Doubt)",
+        "downloads_tab": "डाउनलोड (Downloads)",
+        "quiz_tab": "प्रश्नोत्तरी (Quiz)",
+        "flashcards_tab": "फ़्लैशकार्ड (Flashcards)",
+        "sync_tab": "सिंक (Sync)",
+        "profile_tab": "प्रोफ़ाइल (Profile)",
+        "logout_tab": "लॉग आउट (Logout)",
+        "my_lessons_tab": "मेरे पाठ (My Lessons)",
+        "create_lesson_tab": "नया पाठ बनाएं (Create Lesson)",
+        "upload_content_tab": "दस्तावेज़ अपलोड करें (Upload Content)",
+        "translate_tab": "अनुवाद (Translate)",
+        "voice_tab": "ध्वनि अनुवाद (Voice Translation)",
+        "worksheets_tab": "अभ्यास पत्र (Worksheets)",
+        "ai_assistant_tab": "ए.आई. सहायक (AI Assistant)",
+        "offline_content_tab": "ऑफ़लाइन सामग्री (Offline Content)",
+        "student_home_welcome": "स्वागत है प्यारे छात्र (Welcome Student)",
+        "classroom_nav_title": "कक्षा नेविगेशन (Classroom Navigation)",
+        "continue_learning_desc": "ध्वनि के साथ सक्रिय पाठ जारी रखें (Resume active lesson with audio)",
+        "subjects_desc": "जे-गुरुजी पाठ्यपुस्तकें और अध्याय (J-Guruji textbooks & chapters)",
+        "quiz_desc": "पाठ्यक्रम आधारित ५ प्रश्नोत्तरी (5 grounded syllabus questions)",
+        "flashcards_desc": "संथाली शब्दावली फ़्लैशकार्ड (Santali vocabulary flip cards)",
+        "doubts_desc": "ध्वनि और ए.आई. संदेह सहायक (Voice & AI doubt assistant)",
+        "progress_desc": "अंक, प्रश्नोत्तरी और पाठ प्रगति (Scores & achievements progress)",
+        "downloads_desc": "ऑफ़लाइन सुरक्षित पाठ्य सामग्री (Offline cached lessons)",
+        "sync_desc": "क्लाउड सर्वर से सिंक करें (Synchronize with cloud)",
+        "play_audio_btn": "🔊 ध्वनि सुनें (Play Audio)",
+        "download_offline_btn": "💾 ऑफ़लाइन सहेजें (Download Offline)",
+        "take_quiz_btn": "📝 ५-प्रश्नों की परीक्षा दें (Take 5-Question Quiz)",
+        "view_flashcards_btn": "🗂️ फ़्लैशकार्ड देखें (View Flashcards)",
+        "ask_ai_btn": "❓ ए.आई. से पूछें (Ask AI Assistant)",
+        "speak_doubt_btn": "🎙️ बोलकर पूछें (Speak Doubt)",
+        "lesson_explanation_hdr": "पाठ व्याख्या (Hindi / English Lesson Explanation):",
+        "mother_tongue_hdr": "मातृभाषा सामग्री (Mother Tongue Content • Santali ᱚᱞ ᱪᱤᱠᱤ):",
+        "activities_hdr": "कक्षा गतिविधियाँ एवं स्थानीय उदाहरण (Classroom Activities & Examples):",
+        "quiz_header": "इंटरैक्टिव पाठ प्रश्नोत्तरी (Interactive Topic Quiz - 5 Questions)",
+        "submit_quiz_btn": "उत्तर सबमिट करें (Submit Quiz Answers)",
+        "reset_quiz_btn": "पुनः प्रयास करें (Reset / Retry)",
+        "flashcard_header": "मातृभाषा फ़्लैशकार्ड (Mother Tongue Flashcards)",
+        "speak_card_btn": "🔊 कार्ड सुनें (Speak Card)",
+        "next_btn": "आगे ➡️ (Next)",
+        "prev_btn": "⬅️ पीछे (Previous)"
+      },
+      "English": {
+        "brand_title": "Vernacular AI Pedagogy Platform",
+        "brand_subtitle": "Jharkhand Primary Education • Authoritative J-Guruji & NCERT",
+        "online_status": "🟢 Online • Synced",
+        "offline_status": "🟡 Offline Mode Active",
+        "not_logged_in": "Not Logged In",
+        "welcome_user": "Welcome, {name}",
+        "sign_out": "Sign Out",
+        "auth_welcome_title": "Welcome / ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ",
+        "auth_welcome_sub": "Sign in with your account or create a new profile",
+        "teacher_portal_tab": "Teacher Portal",
+        "student_portal_tab": "Student Portal",
+        "login_btn_tab": "Login",
+        "register_btn_tab": "New User (Register)",
+        "teacher_id_label": "Teacher ID",
+        "student_id_label": "Student ID",
+        "password_label": "Password",
+        "full_name_label": "Full Name",
+        "school_label": "School / Institution",
+        "class_label": "Class / Grade",
+        "lang_pref_label": "Preferred Language",
+        "login_teacher_btn": "Login as Teacher",
+        "register_teacher_btn": "Create Teacher Account",
+        "login_student_btn": "Login as Student",
+        "register_student_btn": "Create Student Account",
+        "dashboard_tab": "Dashboard",
+        "learn_tab": "Continue Learning",
+        "subjects_tab": "Subjects",
+        "progress_tab": "Progress",
+        "doubts_tab": "Ask Doubt",
+        "downloads_tab": "Downloads",
+        "quiz_tab": "Quiz",
+        "flashcards_tab": "Flashcards",
+        "sync_tab": "Sync",
+        "profile_tab": "Profile",
+        "logout_tab": "Logout",
+        "my_lessons_tab": "My Lessons",
+        "create_lesson_tab": "Create Lesson",
+        "upload_content_tab": "Upload Content",
+        "translate_tab": "Translate",
+        "voice_tab": "Voice Translation",
+        "worksheets_tab": "Worksheets",
+        "ai_assistant_tab": "AI Assistant",
+        "offline_content_tab": "Offline Content",
+        "student_home_welcome": "Welcome Student",
+        "classroom_nav_title": "Classroom Navigation",
+        "continue_learning_desc": "Resume active lesson with spoken mother-tongue audio",
+        "subjects_desc": "Official J-Guruji textbooks & chapters",
+        "quiz_desc": "5 grounded syllabus questions",
+        "flashcards_desc": "Santali vocabulary & flip cards",
+        "doubts_desc": "Voice & AI assistant with spoken TTS",
+        "progress_desc": "Scores, completed lessons & achievements",
+        "downloads_desc": "Offline cached classroom storage",
+        "sync_desc": "Synchronize records with server",
+        "play_audio_btn": "🔊 Play Audio (Santali)",
+        "download_offline_btn": "💾 Download Offline",
+        "take_quiz_btn": "📝 Take 5-Question Quiz",
+        "view_flashcards_btn": "🗂️ View Flashcards",
+        "ask_ai_btn": "❓ Ask AI Doubt Assistant",
+        "speak_doubt_btn": "🎙️ Speak Doubt",
+        "lesson_explanation_hdr": "Lesson Explanation (Hindi / English):",
+        "mother_tongue_hdr": "Mother Tongue Content (Santali • ᱚᱞ ᱪᱤᱠᱤ):",
+        "activities_hdr": "Classroom Activities & Local Context:",
+        "quiz_header": "Interactive Topic Quiz (Minimum 5 Questions)",
+        "submit_quiz_btn": "Submit Quiz Answers",
+        "reset_quiz_btn": "Reset / Retry",
+        "flashcard_header": "Mother Tongue Flashcards",
+        "speak_card_btn": "🔊 Speak Card",
+        "next_btn": "Next ➡️",
+        "prev_btn": "⬅️ Previous"
+      }
+    };
+
+    function setAppLanguage(lang) {
+      currentAppLanguage = lang;
+      localStorage.setItem('vernacular_pref_lang', lang);
+
+      // Highlight active pill buttons in header and auth
+      ['btnLangSantali', 'authLangSantali'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', lang === 'Santali');
+      });
+      ['btnLangHindi', 'authLangHindi'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', lang === 'Hindi');
+      });
+      ['btnLangEnglish', 'authLangEnglish'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', lang === 'English');
+      });
+
+      // Synchronize register language dropdowns if present
+      const regTeacherLang = document.getElementById('regTeacherLang');
+      if (regTeacherLang) {
+        if (lang === 'Santali') regTeacherLang.value = 'Santali (English)';
+        else if (lang === 'Hindi') regTeacherLang.value = 'Hindi (English)';
+        else regTeacherLang.value = 'English';
+      }
+      const regStudentLang = document.getElementById('regStudentLang');
+      if (regStudentLang) {
+        if (lang === 'Santali') regStudentLang.value = 'Santali (English)';
+        else if (lang === 'Hindi') regStudentLang.value = 'Hindi (English)';
+        else regStudentLang.value = 'English';
+      }
+
+      // If user is currently logged in, update their preferred_language
+      if (currentUser) {
+        currentUser.preferred_language = (lang === 'Santali') ? 'Santali (English)' : ((lang === 'Hindi') ? 'Hindi (English)' : 'English');
+        localStorage.setItem('vernacular_current_user', JSON.stringify(currentUser));
+        if (document.getElementById('studentHomeLang')) document.getElementById('studentHomeLang').innerText = currentUser.preferred_language;
+        if (document.getElementById('teacherHomeLang')) document.getElementById('teacherHomeLang').innerText = currentUser.preferred_language;
+      }
+
+      applyLocalization();
+    }
+
+    function getLText(key, fallback = '') {
+      const dict = UI_STRINGS[currentAppLanguage] || UI_STRINGS['Santali'];
+      return dict[key] || fallback || key;
+    }
+
+    function applyLocalization() {
+      const d = UI_STRINGS[currentAppLanguage] || UI_STRINGS['Santali'];
+
+      // Header Brand
+      const bt = document.getElementById('brandTitle');
+      if (bt) bt.innerHTML = `<span>🏫</span><span>${d.brand_title}</span>`;
+      const bs = document.getElementById('brandSubtitle');
+      if (bs) bs.innerText = d.brand_subtitle;
+
+      // Sync & User status
+      const st = document.getElementById('syncText');
+      if (st && !st.innerText.includes('Syncing')) st.innerText = d.online_status.replace('🟢 ', '');
+      const un = document.getElementById('userNameBadge');
+      if (un) {
+        if (currentUser) un.innerText = d.welcome_user.replace('{name}', currentUser.name);
+        else un.innerText = d.not_logged_in;
+      }
+      const lo = document.getElementById('logoutBtn');
+      if (lo) lo.innerText = d.sign_out;
+
+      // Auth View Titles & Tabs
+      const awt = document.getElementById('authWelcomeTitle');
+      if (awt) awt.innerText = d.auth_welcome_title;
+      const aws = document.getElementById('authWelcomeSub');
+      if (aws) aws.innerText = d.auth_welcome_sub;
+      const ttr = document.getElementById('tabTeacherRole');
+      if (ttr) ttr.innerText = d.teacher_portal_tab;
+      const tsr = document.getElementById('tabStudentRole');
+      if (tsr) tsr.innerText = d.student_portal_tab;
+
+      // Auth Buttons & Labels
+      const bttl = document.getElementById('btnTeacherToggleLogin');
+      if (bttl) bttl.innerText = d.login_btn_tab;
+      const bttr = document.getElementById('btnTeacherToggleReg');
+      if (bttr) bttr.innerText = d.register_btn_tab;
+      const bstl = document.getElementById('btnStudentToggleLogin');
+      if (bstl) bstl.innerText = d.login_btn_tab;
+      const bstr = document.getElementById('btnStudentToggleReg');
+      if (bstr) bstr.innerText = d.register_btn_tab;
+
+      const lti = document.getElementById('lblTeacherId');
+      if (lti) lti.innerText = d.teacher_id_label;
+      const ltp = document.getElementById('lblTeacherPwd');
+      if (ltp) ltp.innerText = d.password_label;
+      const blt = document.getElementById('btnLoginTeacher');
+      if (blt) blt.innerText = d.login_teacher_btn;
+
+      const lrtn = document.getElementById('lblRegTeacherName');
+      if (lrtn) lrtn.innerText = d.full_name_label;
+      const lrts = document.getElementById('lblRegTeacherSchool');
+      if (lrts) lrts.innerText = d.school_label;
+      const lrti = document.getElementById('lblRegTeacherId');
+      if (lrti) lrti.innerText = d.teacher_id_label;
+      const lrtp = document.getElementById('lblRegTeacherPwd');
+      if (lrtp) lrtp.innerText = d.password_label;
+      const lrtl = document.getElementById('lblRegTeacherLang');
+      if (lrtl) lrtl.innerText = d.lang_pref_label;
+      const brt = document.getElementById('btnRegisterTeacher');
+      if (brt) brt.innerText = d.register_teacher_btn;
+
+      const lsi = document.getElementById('lblStudentId');
+      if (lsi) lsi.innerText = d.student_id_label;
+      const lsp = document.getElementById('lblStudentPwd');
+      if (lsp) lsp.innerText = d.password_label;
+      const bls = document.getElementById('btnLoginStudent');
+      if (bls) bls.innerText = d.login_student_btn;
+
+      const lrsn = document.getElementById('lblRegStudentName');
+      if (lrsn) lrsn.innerText = d.full_name_label;
+      const lrss = document.getElementById('lblRegStudentSchool');
+      if (lrss) lrss.innerText = d.school_label;
+      const lrsi = document.getElementById('lblRegStudentId');
+      if (lrsi) lrsi.innerText = d.student_id_label;
+      const lrsp = document.getElementById('lblRegStudentPwd');
+      if (lrsp) lrsp.innerText = d.password_label;
+      const lrsc = document.getElementById('lblRegStudentClass');
+      if (lrsc) lrsc.innerText = d.class_label;
+      const lrsl = document.getElementById('lblRegStudentLang');
+      if (lrsl) lrsl.innerText = d.lang_pref_label;
+      const brs = document.getElementById('btnRegisterStudent');
+      if (brs) brs.innerText = d.register_student_btn;
+
+      // Student Portal Tabs
+      const t_shome = document.getElementById('tabStudent_home');
+      if (t_shome) t_shome.innerText = d.dashboard_tab;
+      const t_slearn = document.getElementById('tabStudent_learn');
+      if (t_slearn) t_slearn.innerText = d.learn_tab;
+      const t_ssubj = document.getElementById('tabStudent_subjects');
+      if (t_ssubj) t_ssubj.innerText = d.subjects_tab;
+      const t_sprog = document.getElementById('tabStudent_progress');
+      if (t_sprog) t_sprog.innerText = d.progress_tab;
+      const t_sdoubts = document.getElementById('tabStudent_doubts');
+      if (t_sdoubts) t_sdoubts.innerText = d.doubts_tab;
+      const t_sdl = document.getElementById('tabStudent_downloads');
+      if (t_sdl) t_sdl.innerText = d.downloads_tab;
+      const t_squiz = document.getElementById('tabStudent_quiz');
+      if (t_squiz) t_squiz.innerText = d.quiz_tab;
+      const t_sfc = document.getElementById('tabStudent_flashcards');
+      if (t_sfc) t_sfc.innerText = d.flashcards_tab;
+      const t_ssync = document.getElementById('tabStudent_sync');
+      if (t_ssync) t_ssync.innerText = d.sync_tab;
+      const t_sprof = document.getElementById('tabStudent_profile');
+      if (t_sprof) t_sprof.innerText = d.profile_tab;
+
+      // Teacher Portal Tabs
+      const t_thome = document.getElementById('tabTeacher_home');
+      if (t_thome) t_thome.innerText = d.dashboard_tab;
+      const t_tless = document.getElementById('tabTeacher_lessons');
+      if (t_tless) t_tless.innerText = d.my_lessons_tab;
+      const t_tcreate = document.getElementById('tabTeacher_create');
+      if (t_tcreate) t_tcreate.innerText = d.create_lesson_tab;
+      const t_tupload = document.getElementById('tabTeacher_upload');
+      if (t_tupload) t_tupload.innerText = d.upload_content_tab;
+      const t_ttrans = document.getElementById('tabTeacher_translate');
+      if (t_ttrans) t_ttrans.innerText = d.translate_tab;
+      const t_tvoice = document.getElementById('tabTeacher_voice');
+      if (t_tvoice) t_tvoice.innerText = d.voice_tab;
+      const t_tws = document.getElementById('tabTeacher_worksheets');
+      if (t_tws) t_tws.innerText = d.worksheets_tab;
+      const t_tfc = document.getElementById('tabTeacher_flashcards');
+      if (t_tfc) t_tfc.innerText = d.flashcards_tab;
+      const t_tai = document.getElementById('tabTeacher_ai');
+      if (t_tai) t_tai.innerText = d.ai_assistant_tab;
+      const t_toff = document.getElementById('tabTeacher_offline');
+      if (t_toff) t_toff.innerText = d.offline_content_tab;
+      const t_tsync = document.getElementById('tabTeacher_sync');
+      if (t_tsync) t_tsync.innerText = d.sync_tab;
+      const t_tprof = document.getElementById('tabTeacher_profile');
+      if (t_tprof) t_tprof.innerText = d.profile_tab;
+
+      // Student Home Screen
+      const shw = document.getElementById('studentHomeWelcome');
+      if (shw && currentUser) shw.innerText = d.welcome_user.replace('{name}', currentUser.name);
+    }
+
+    // Auto-restore session from LocalStorage on initial load
+    window.addEventListener('DOMContentLoaded', () => {
+      // Initialize app language first
+      setAppLanguage(currentAppLanguage);
+
+      const savedUser = localStorage.getItem('vernacular_current_user');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          currentGrade = currentUser.class_number || 3;
+          if (currentUser.preferred_language) {
+            const pl = currentUser.preferred_language.toLowerCase();
+            if (pl.includes('santali')) setAppLanguage('Santali');
+            else if (pl.includes('hindi')) setAppLanguage('Hindi');
+            else if (pl.includes('english')) setAppLanguage('English');
+          }
+          setupUserSession();
+        } catch (e) {
+          localStorage.removeItem('vernacular_current_user');
+        }
+      }
+    });
+
+    // --- AUTH TOGGLING ---
+    function switchRole(role) {
+      document.getElementById('tabTeacherRole').classList.toggle('active', role === 'teacher');
+      document.getElementById('tabStudentRole').classList.toggle('active', role === 'student');
+      document.getElementById('teacherAuthSection').style.display = role === 'teacher' ? 'block' : 'none';
+      document.getElementById('studentAuthSection').style.display = role === 'student' ? 'block' : 'none';
+    }
+
+    function setTeacherAuthMode(mode) {
+      document.getElementById('teacherLoginForm').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('teacherRegisterForm').style.display = mode === 'register' ? 'block' : 'none';
+      document.getElementById('btnTeacherToggleLogin').classList.toggle('btn', mode === 'login');
+      document.getElementById('btnTeacherToggleLogin').classList.toggle('btn-secondary', mode !== 'login');
+      document.getElementById('btnTeacherToggleReg').classList.toggle('btn', mode === 'register');
+      document.getElementById('btnTeacherToggleReg').classList.toggle('btn-secondary', mode !== 'register');
+    }
+
+    function setStudentAuthMode(mode) {
+      document.getElementById('studentLoginForm').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('studentRegisterForm').style.display = mode === 'register' ? 'block' : 'none';
+      document.getElementById('btnStudentToggleLogin').classList.toggle('btn', mode === 'login');
+      document.getElementById('btnStudentToggleLogin').classList.toggle('btn-secondary', mode !== 'login');
+      document.getElementById('btnStudentToggleReg').classList.toggle('btn', mode === 'register');
+      document.getElementById('btnStudentToggleReg').classList.toggle('btn-secondary', mode !== 'register');
+    }
+
+    // --- AUTH ACTIONS ---
+    async function loginTeacher() {
+      const id = document.getElementById('teacherIdInput').value.trim();
+      const pwd = document.getElementById('teacherPwdInput').value.trim();
+      if (!id || !pwd) { alert('Please enter both Teacher ID and password.'); return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/teacher/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: id, password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          localStorage.setItem('vernacular_current_user', JSON.stringify(currentUser));
+          setupUserSession();
+        } else {
+          alert(data.detail || 'Login failed');
+        }
+      } catch (err) {
+        alert('Could not reach backend: ' + err);
+      }
+    }
+
+    async function registerTeacher() {
+      const name = document.getElementById('regTeacherName').value.trim();
+      const school = document.getElementById('regTeacherSchool').value.trim();
+      const id = document.getElementById('regTeacherId').value.trim();
+      const pwd = document.getElementById('regTeacherPwd').value.trim();
+      const lang = document.getElementById('regTeacherLang').value;
+
+      if (!name || !school || !id || !pwd) { alert('Please fill in all registration fields.'); return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/teacher/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, school: school, teacher_id: id, password: pwd, preferred_language: lang })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          localStorage.setItem('vernacular_current_user', JSON.stringify(currentUser));
+          setupUserSession();
+        } else {
+          alert(data.detail || 'Registration failed');
+        }
+      } catch (err) {
+        alert('Could not reach backend: ' + err);
+      }
+    }
+
+    async function loginStudent() {
+      const id = document.getElementById('studentIdInput').value.trim();
+      const pwd = document.getElementById('studentPwdInput').value.trim();
+      if (!id || !pwd) { alert('Please enter both Student ID and password.'); return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/student/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: id, password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          currentGrade = currentUser.class_number || 3;
+          localStorage.setItem('vernacular_current_user', JSON.stringify(currentUser));
+          setupUserSession();
+        } else {
+          alert(data.detail || 'Login failed');
+        }
+      } catch (err) {
+        alert('Could not reach backend: ' + err);
+      }
+    }
+
+    async function registerStudent() {
+      const name = document.getElementById('regStudentName').value.trim();
+      const school = document.getElementById('regStudentSchool').value.trim();
+      const id = document.getElementById('regStudentId').value.trim();
+      const pwd = document.getElementById('regStudentPwd').value.trim();
+      const cls = parseInt(document.getElementById('regStudentClass').value);
+      const lang = document.getElementById('regStudentLang').value;
+
+      if (!name || !school || !id || !pwd) { alert('Please fill in all registration fields.'); return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/student/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, school: school, student_id: id, password: pwd, class_number: cls, preferred_language: lang })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          currentGrade = cls;
+          localStorage.setItem('vernacular_current_user', JSON.stringify(currentUser));
+          setupUserSession();
+        } else {
+          alert(data.detail || 'Registration failed');
+        }
+      } catch (err) {
+        alert('Could not reach backend: ' + err);
+      }
+    }
+
+    function setupUserSession() {
+      if (!currentUser) return;
+      document.getElementById('authView').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'inline-flex';
+
+      // Re-apply localization for active user session
+      applyLocalization();
+
+      if (currentUser.role === 'teacher') {
+        document.getElementById('teacherPortal').style.display = 'block';
+        document.getElementById('studentPortal').style.display = 'none';
+        if (document.getElementById('teacherHomeWelcome')) {
+          document.getElementById('teacherHomeWelcome').innerText = getLText('welcome_user').replace('{name}', currentUser.name);
+        }
+        if (document.getElementById('teacherHomeId')) document.getElementById('teacherHomeId').innerText = currentUser.identifier;
+        if (document.getElementById('teacherHomeSchool')) document.getElementById('teacherHomeSchool').innerText = currentUser.school || 'Government Primary School';
+        if (document.getElementById('teacherHomeLang')) document.getElementById('teacherHomeLang').innerText = currentUser.preferred_language || 'English';
+        showTeacherSection('home');
+        loadTeacherStats();
+        loadTeacherSubjects();
+        loadTeacherPublishedLessons();
+      } else {
+        document.getElementById('teacherPortal').style.display = 'none';
+        document.getElementById('studentPortal').style.display = 'block';
+        if (document.getElementById('studentHomeWelcome')) {
+          document.getElementById('studentHomeWelcome').innerText = getLText('welcome_user').replace('{name}', currentUser.name);
+        }
+        document.getElementById('studentHomeClass').innerText = `Class ${currentGrade}`;
+        if (document.getElementById('studentHomeSchool')) document.getElementById('studentHomeSchool').innerText = currentUser.school || 'Government Primary School';
+        document.getElementById('studentHomeLang').innerText = currentUser.preferred_language || 'Santali (English)';
+        document.getElementById('studentClassBadge').innerText = `Class ${currentGrade}`;
+        showStudentSection('home');
+        loadStudentSubjects();
+        loadStudentContinueLearning();
+        loadStudentProgress();
+        loadDownloadedLessons();
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('vernacular_current_user');
+      document.getElementById('authView').style.display = 'block';
+      document.getElementById('teacherPortal').style.display = 'none';
+      document.getElementById('studentPortal').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      applyLocalization();
+    }
+
+    // --- NAVIGATION SECTIONS ---
+    function showTeacherSection(sec) {
+      document.querySelectorAll('#teacherPortal .tabs .tab').forEach(t => t.classList.remove('active'));
+      const activeTab = document.getElementById(`tabTeacher_${sec}`);
+      if (activeTab) activeTab.classList.add('active');
+
+      const ids = ['secTeacherHome', 'secTeacherCreate', 'secTeacherLessons', 'secTeacherUpload', 'secTeacherTranslate', 'secTeacherVoice', 'secTeacherAI', 'secTeacherWorksheets', 'secTeacherOffline'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+
+      if (sec === 'home') { document.getElementById('secTeacherHome').style.display = 'block'; loadTeacherStats(); }
+      if (sec === 'create') {
+        document.getElementById('secTeacherCreate').style.display = 'block';
+        loadTeacherSubjects();
+      }
+      if (sec === 'lessons') { document.getElementById('secTeacherLessons').style.display = 'block'; loadTeacherPublishedLessons(); }
+      if (sec === 'upload') document.getElementById('secTeacherUpload').style.display = 'block';
+      if (sec === 'translate') document.getElementById('secTeacherTranslate').style.display = 'block';
+      if (sec === 'voice') document.getElementById('secTeacherVoice').style.display = 'block';
+      if (sec === 'worksheets') document.getElementById('secTeacherWorksheets').style.display = 'block';
+      if (sec === 'flashcards') { showTeacherSection('ai'); generateFlashcardsForLesson(); }
+      if (sec === 'ai') document.getElementById('secTeacherAI').style.display = 'block';
+      if (sec === 'offline') {
+        const el = document.getElementById('secTeacherOffline');
+        if (el) el.style.display = 'block';
+        updateTeacherOfflineStats();
+      }
+    }
+
+    function showStudentSection(sec) {
+      document.querySelectorAll('#studentPortal .tabs .tab').forEach(t => t.classList.remove('active'));
+      const activeTab = document.getElementById(`tabStudent_${sec}`);
+      if (activeTab) activeTab.classList.add('active');
+
+      const ids = ['secStudentHome', 'secStudentLearn', 'secStudentSubjects', 'secStudentQuiz', 'secStudentFlashcards', 'secStudentDoubts', 'secStudentProgress', 'secStudentDownloads'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+
+      if (sec === 'home') document.getElementById('secStudentHome').style.display = 'block';
+      if (sec === 'learn') {
+        document.getElementById('secStudentLearn').style.display = 'block';
+        loadActiveLesson(currentLessonId);
+      }
+      if (sec === 'subjects') { document.getElementById('secStudentSubjects').style.display = 'block'; loadStudentSubjects(); }
+      if (sec === 'quiz') { document.getElementById('secStudentQuiz').style.display = 'block'; loadLessonQuiz(); }
+      if (sec === 'flashcards') { document.getElementById('secStudentFlashcards').style.display = 'block'; loadStudentFlashcards(); }
+      if (sec === 'doubts') document.getElementById('secStudentDoubts').style.display = 'block';
+      if (sec === 'progress') { document.getElementById('secStudentProgress').style.display = 'block'; loadStudentProgress(); }
+      if (sec === 'downloads') {
+        const dl = document.getElementById('secStudentDownloads');
+        if (dl) dl.style.display = 'block';
+        loadDownloadedLessons();
+      }
+    }
+
+    // --- DYNAMIC CURRICULUM LOADING (STRICT J-GURUJI) ---
+    async function loadTeacherSubjects() {
+      const cls = document.getElementById('teacherClassSelect').value;
+      const res = await fetch(`${API_BASE}/subjects/${cls}`);
+      const subjects = await res.json();
+      const sel = document.getElementById('teacherSubjectSelect');
+      sel.innerHTML = '';
+      subjects.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.text = `${s.name} (${s.original_name || ''})`;
+        opt.dataset.name = s.name;
+        sel.appendChild(opt);
+      });
+      loadTeacherChapters();
+    }
+
+    async function loadTeacherChapters() {
+      const subjId = document.getElementById('teacherSubjectSelect').value;
+      if (!subjId) return;
+      const res = await fetch(`${API_BASE}/chapters/${subjId}`);
+      const chapters = await res.json();
+      const sel = document.getElementById('teacherChapterSelect');
+      sel.innerHTML = '';
+      chapters.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.text = `${c.name} - ${c.original_name || ''}`;
+        opt.dataset.name = c.name;
+        sel.appendChild(opt);
+      });
+      loadTeacherLessons();
+    }
+
+    async function loadTeacherLessons() {
+      const chapId = document.getElementById('teacherChapterSelect').value;
+      if (!chapId) return;
+      const res = await fetch(`${API_BASE}/subtopics/${chapId}`);
+      const lessons = await res.json();
+      const sel = document.getElementById('teacherLessonSelect');
+      sel.innerHTML = '';
+      lessons.forEach(l => {
+        const opt = document.createElement('option');
+        opt.value = l.id;
+        opt.text = `${l.title} (${l.original_name || ''})`;
+        opt.dataset.title = l.title;
+        sel.appendChild(opt);
+      });
+    }
+
+    async function generateLessonWithAI() {
+      const cls = parseInt(document.getElementById('teacherClassSelect').value);
+      const subjOpt = document.getElementById('teacherSubjectSelect').selectedOptions[0];
+      const chapOpt = document.getElementById('teacherChapterSelect').selectedOptions[0];
+      const lesOpt = document.getElementById('teacherLessonSelect').selectedOptions[0];
+
+      const res = await fetch(`${API_BASE}/generate-lesson`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          class_number: cls,
+          subject: subjOpt ? subjOpt.dataset.name : "General",
+          chapter: chapOpt ? chapOpt.dataset.name : "Topic",
+          topic: lesOpt ? lesOpt.dataset.title : "",
+          language: "Santali"
+        })
+      });
+      const data = await res.json();
+      document.getElementById('lessonTitleInput').value = data.title;
+      document.getElementById('lessonContentInput').value = data.content;
+      document.getElementById('lessonActivitiesInput').value = data.activities;
+      document.getElementById('lessonSantaliInput').value = data.santali_translation;
+    }
+
+    async function saveTeacherLesson(publishNow) {
+      const lesId = parseInt(document.getElementById('teacherLessonSelect').value);
+      const title = document.getElementById('lessonTitleInput').value.trim();
+      const content = document.getElementById('lessonContentInput').value.trim();
+      const santali = document.getElementById('lessonSantaliInput').value.trim();
+      const activities = document.getElementById('lessonActivitiesInput').value.trim();
+
+      if (!title || !content) {
+        alert('Please provide lesson title and content.');
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/lessons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teacher_identifier: currentUser.identifier,
+          lesson_id: lesId,
+          title: title,
+          content: content,
+          santali_translation: santali,
+          activities: activities,
+          publish_now: publishNow
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(publishNow ? 'Lesson Published! Students can now access this update via Sync.' : 'Draft Saved.');
+        loadTeacherPublishedLessons();
+      }
+    }
+
+    async function loadTeacherPublishedLessons() {
+      const res = await fetch(`${API_BASE}/teacher/lessons?identifier=${currentUser.identifier}`);
+      const lessons = await res.json();
+      const list = document.getElementById('teacherLessonsList');
+      if (!lessons.length) {
+        list.innerHTML = '<p style="color: var(--text-muted);">No lessons created yet. Select an official J-Guruji curriculum item to create your first lesson.</p>';
+        return;
+      }
+      list.innerHTML = lessons.map(l => `
+        <div class="card" style="margin-bottom: 0.8rem; background: var(--surface-subtle); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>${l.title}</strong>
+            <span class="sync-status-badge" style="background: ${l.is_published ? 'var(--accent-green-bg)' : '#FEF3C7'}; color: ${l.is_published ? 'var(--accent-green)' : '#B45309'}; margin-left: 0.5rem;">
+              ${l.is_published ? 'Published (v' + l.version + ')' : 'Draft (v' + l.version + ')'}
+            </span>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem;">
+              Class ${l.class_number} &bull; ${l.subject} &bull; ${l.chapter}
+            </div>
+          </div>
+          <div>
+            ${!l.is_published ? `<button class="btn btn-green" onclick="publishExistingLesson(${l.id})">Publish</button>` : `<span style="color: var(--accent-green); font-size: 0.9rem; font-weight: 600;">✓ Live</span>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function publishExistingLesson(id) {
+      const res = await fetch(`${API_BASE}/lessons/${id}/publish`, { method: 'POST' });
+      if (res.ok) {
+        alert('Lesson Published successfully!');
+        loadTeacherPublishedLessons();
+      }
+    }
+
+    // --- UPLOAD MAPPING ---
+    async function uploadDocument() {
+      const fileInput = document.getElementById('teacherUploadFile');
+      if (!fileInput.files.length) {
+        alert('Please select a file first.');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('teacher_identifier', currentUser.identifier);
+
+      const res = await fetch(`${API_BASE}/upload-document`, { method: 'POST', body: formData });
+      const data = await res.json();
+      const out = document.getElementById('uploadResult');
+
+      if (data.status === 'SUCCESS') {
+        out.innerHTML = `
+          <div class="alert alert-success">
+            <strong>✓ Document Analyzed & Grounded:</strong> Successfully matched to J-Guruji syllabus item!<br>
+            Mapped to: <strong>Class ${data.mapped_lesson.class_number} &bull; ${data.mapped_lesson.subject} &bull; ${data.mapped_lesson.chapter}</strong><br>
+            <button class="btn" style="margin-top: 0.5rem;" onclick="applyMappedLesson(${data.mapped_lesson.class_number}, ${data.mapped_lesson.lesson_id})">Open in Lesson Editor</button>
+          </div>
+        `;
+      } else {
+        out.innerHTML = `
+          <div class="alert" style="background: #FEE2E2; border: 1px solid #FCA5A5; color: #991B1B;">
+            ${data.message}
+          </div>
+        `;
+      }
+    }
+
+    function applyMappedLesson(cls, lesId) {
+      document.getElementById('teacherClassSelect').value = cls;
+      showTeacherSection('create');
+      loadTeacherSubjects();
+    }
+
+    // --- TRANSLATION & AUDIO PLAYBACK ---
+    async function performTranslation() {
+      const text = document.getElementById('transInputText').value.trim();
+      const src = document.getElementById('transSrcLang').value;
+      const tgt = document.getElementById('transTgtLang').value;
+
+      if (!text) return;
+      const res = await fetch(`${API_BASE}/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text, source_language: src, target_language: tgt })
+      });
+      const data = await res.json();
+      document.getElementById('transOutputText').innerText = data.translated_text || 'No translation available';
+      document.getElementById('transStatus').innerText = `Engine: ${data.engine || 'Vernacular Core'} | Status: ${data.status}`;
+    }
+
+    function playVernacularAudio(text, lang = 'hi') {
+      if (!text || !text.trim()) return;
+      const statusEl = document.getElementById('audioPlayingStatus');
+      if (statusEl) { statusEl.style.display = 'inline-flex'; }
+
+      try {
+        globalAudioPlayer.pause();
+        // Point directly to backend TTS endpoint
+        const cleanForAudio = text.replace(/[\n\r]+/g, ' ').trim();
+        const ttsUrl = `${API_BASE}/api/tts?text=${encodeURIComponent(cleanForAudio)}&lang=${lang}`;
+        globalAudioPlayer.src = ttsUrl;
+
+        globalAudioPlayer.onended = () => {
+          if (statusEl) statusEl.style.display = 'none';
+        };
+        globalAudioPlayer.onerror = () => {
+          speakWithSpeechSynthesis(text);
+        };
+        globalAudioPlayer.play().catch(() => {
+          speakWithSpeechSynthesis(text);
+        });
+      } catch (err) {
+        speakWithSpeechSynthesis(text);
+      }
+    }
+
+    function speakWithSpeechSynthesis(text) {
+      const statusEl = document.getElementById('audioPlayingStatus');
+      // Extract phonetic/roman pronunciation inside brackets if present
+      const bracketMatch = text.match(/\(([^)]+)\)/);
+      const textToSpeak = bracketMatch ? bracketMatch[1] : text.replace(/[ᱚ-ᱽ]/g, '').trim() || text;
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(textToSpeak);
+        u.lang = 'hi-IN';
+        u.rate = 0.9;
+        u.onend = () => { if (statusEl) statusEl.style.display = 'none'; };
+        u.onerror = () => { if (statusEl) statusEl.style.display = 'none'; };
+        window.speechSynthesis.speak(u);
+      } else {
+        if (statusEl) statusEl.style.display = 'none';
+      }
+    }
+
+    function speakSantaliDirect(text) {
+      playVernacularAudio(text, 'hi');
+    }
+
+    function speakSantaliAudio(elemId) {
+      const el = document.getElementById(elemId);
+      const val = el ? (el.value || el.innerText) : '';
+      playVernacularAudio(val, 'hi');
+    }
+
+    // --- VOICE RECOGNITION (SPEECH INPUT) ---
+    function startTeacherSpeechInput() {
+      const inputEl = document.getElementById('voiceTextInput');
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const rec = new SpeechRec();
+        rec.lang = 'hi-IN';
+        inputEl.placeholder = '🎙️ Listening... Please speak in Hindi or English...';
+        rec.start();
+        rec.onresult = function(e) {
+          inputEl.value = e.results[0][0].transcript;
+          inputEl.placeholder = 'Speech transcript captured';
+        };
+        rec.onerror = function() {
+          inputEl.placeholder = 'Type your phrase directly';
+        };
+      } else {
+        alert('Web Speech recognition not available on this browser. You can type directly in the field.');
+      }
+    }
+
+    function startStudentSpeechInput() {
+      const inputEl = document.getElementById('studentDoubtInput');
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const rec = new SpeechRec();
+        rec.lang = 'hi-IN';
+        inputEl.placeholder = '🎙️ Listening... Speak your doubt clearly...';
+        rec.start();
+        rec.onresult = function(e) {
+          inputEl.value = e.results[0][0].transcript;
+          inputEl.placeholder = 'e.g. संख्या को संथाली में कैसे गिनते हैं?';
+        };
+        rec.onerror = function() {
+          inputEl.placeholder = 'e.g. संख्या को संथाली में कैसे गिनते हैं?';
+        };
+      } else {
+        alert('Voice microphone ready: You can type your doubt directly if mic permission is not enabled.');
+      }
+    }
+
+    async function runVoiceTranslation() {
+      const text = document.getElementById('voiceTextInput').value.trim();
+      if (!text) {
+        alert('Please enter or speak a phrase to translate.');
+        return;
+      }
+      document.getElementById('voiceResult').innerHTML = '<div class="alert alert-info">Processing real-time speech pipeline & synthesizing audio...</div>';
+      try {
+        const res = await fetch(`${API_BASE}/voice-translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript_text: text, source_language: 'Hindi', target_language: 'Santali' })
+        });
+        const data = await res.json();
+        document.getElementById('voiceResult').innerHTML = `
+          <div class="card" style="background: var(--surface-subtle); margin-top: 1rem;">
+            <h4>Voice Pipeline Completed (Measured Latency: ${data.latency_seconds}s)</h4>
+            <p style="margin-top: 0.5rem;"><strong>Input Speech:</strong> ${data.input_transcript}</p>
+            <p style="margin-top: 0.5rem;"><strong>Santali Ol Chiki Translation:</strong> <span class="ol-chiki" style="font-size: 1.15rem; color: var(--primary);">${data.translated_text}</span></p>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+              <button class="btn btn-green" onclick="playVernacularAudio('${data.translated_text.replace(/'/g, "\\'")}', 'hi')">🔊 Play Voice Audio (Santali)</button>
+              <span style="font-size: 0.85rem; color: var(--accent-green); font-weight: 600;">✓ Audio Synthesized</span>
+            </div>
+          </div>
+        `;
+        // Auto-play synthesized speech audio
+        playVernacularAudio(data.translated_text, 'hi');
+      } catch (err) {
+        document.getElementById('voiceResult').innerHTML = `<div class="alert" style="background: #FEE2E2; color: #991B1B;">Voice translation failed: ${err}</div>`;
+      }
+    }
+
+    // --- AI ASSISTANT (QUIZZES, FLASHCARDS, WORKSHEETS) ---
+    async function generateQuizForLesson() {
+      const lesId = parseInt(document.getElementById('teacherLessonSelect').value || 1);
+      const cls = parseInt(document.getElementById('teacherClassSelect').value || 3);
+      const subj = document.getElementById('teacherSubjectSelect').selectedOptions[0]?.dataset.name || "Mathematics";
+      const chap = document.getElementById('teacherChapterSelect').selectedOptions[0]?.dataset.name || "Numbers";
+
+      const res = await fetch(`${API_BASE}/generate-quiz`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: lesId, class_number: cls, subject: subj, chapter: chap, language: "Santali" })
+      });
+      const data = await res.json();
+      currentQuizData = data;
+      document.getElementById('aiOutputArea').innerHTML = `
+        <div class="alert alert-success">
+          <strong>✓ 5-Question Quiz Generated & Saved!</strong> Grounded in Class ${cls} ${subj} (${chap}).
+        </div>
+      `;
+    }
+
+    async function generateFlashcardsForLesson() {
+      const lesId = parseInt(document.getElementById('teacherLessonSelect').value || 1);
+      const cls = parseInt(document.getElementById('teacherClassSelect').value || 3);
+      const subj = document.getElementById('teacherSubjectSelect').selectedOptions[0]?.dataset.name || "Mathematics";
+      const chap = document.getElementById('teacherChapterSelect').selectedOptions[0]?.dataset.name || "Numbers";
+
+      const res = await fetch(`${API_BASE}/generate-flashcards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: lesId, class_number: cls, subject: subj, chapter: chap })
+      });
+      const data = await res.json();
+      flashcardsList = data.flashcards;
+      document.getElementById('aiOutputArea').innerHTML = `
+        <div class="alert alert-success">
+          <strong>✓ 5 Mother Tongue Flashcards Generated!</strong> Grounded strictly in J-Guruji curriculum.
+        </div>
+      `;
+    }
+
+    async function generateWorksheetForLesson() {
+      const lesId = parseInt(document.getElementById('teacherLessonSelect').value || 1);
+      const cls = parseInt(document.getElementById('teacherClassSelect').value || 3);
+      const subj = document.getElementById('teacherSubjectSelect').selectedOptions[0]?.dataset.name || "Mathematics";
+      const chap = document.getElementById('teacherChapterSelect').selectedOptions[0]?.dataset.name || "Numbers";
+
+      const res = await fetch(`${API_BASE}/generate-worksheet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: lesId, class_number: cls, subject: subj, chapter: chap })
+      });
+      const data = await res.json();
+      document.getElementById('worksheetDisplay').innerHTML = `
+        <div class="card" style="background: #FFF; white-space: pre-wrap; font-family: monospace; font-size: 0.95rem; border: 2px solid var(--border);">
+${data.content_bilingual}
+        </div>
+        <button class="btn btn-green" style="margin-top: 1rem;" onclick="window.print()">🖨️ Export as PDF / Print Worksheet</button>
+      `;
+      showTeacherSection('worksheets');
+    }
+
+    // --- STUDENT SECTIONS ---
+    async function loadStudentSubjects() {
+      const res = await fetch(`${API_BASE}/curriculum/${currentGrade}`);
+      const data = await res.json();
+      const grid = document.getElementById('studentSubjectsGrid');
+      grid.innerHTML = data.subjects.map(s => `
+        <div class="card" style="background: var(--surface-subtle); cursor: pointer;" onclick="loadChaptersForSubject(${s.id}, '${s.name}')">
+          <h4>${s.name}</h4>
+          <span style="font-size: 0.9rem; color: var(--text-muted);">${s.original_name || ''}</span>
+          <div style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--primary); font-weight: 600;">
+            ${s.chapters_count} Chapters (Class ${currentGrade}) &rarr;
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadChaptersForSubject(subjId, subjName) {
+      const res = await fetch(`${API_BASE}/chapters/${subjId}`);
+      const chapters = await res.json();
+      const grid = document.getElementById('studentSubjectsGrid');
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
+          <button class="btn btn-secondary" onclick="loadStudentSubjects()">&larr; Back to Subjects</button>
+          <h3 style="margin-top: 0.8rem;">${subjName} Chapters (Class ${currentGrade})</h3>
+        </div>
+        ${chapters.map(c => `
+          <div class="card" style="background: var(--surface-subtle); cursor: pointer;" onclick="openCurriculumChapter(${c.id}, '${c.name}', '${subjName}')">
+            <h4>${c.name}</h4>
+            <span style="font-size: 0.9rem; color: var(--text-muted);">${c.original_name || ''}</span>
+            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--primary); font-weight: 600;">
+              Learn Chapter &rarr;
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    async function openCurriculumChapter(chapId, chapName, subjName) {
+      try {
+        const res = await fetch(`${API_BASE}/subtopics/${chapId}`);
+        const lessons = await res.json();
+        const grid = document.getElementById('studentSubjectsGrid');
+
+        if (!lessons || !lessons.length) {
+          alert('No topics registered under this chapter yet.');
+          return;
+        }
+
+        if (lessons.length === 1) {
+          currentLessonId = lessons[0].id;
+          showStudentSection('learn');
+          loadActiveLesson(currentLessonId);
+          return;
+        }
+
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
+            <button class="btn btn-secondary" onclick="loadStudentSubjects()">&larr; Back to Subjects</button>
+            <h3 style="margin-top: 0.8rem;">${subjName} &bull; ${chapName} Topics (Class ${currentGrade})</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Select a topic to start learning in Santali & Hindi:</p>
+          </div>
+          ${lessons.map((l, idx) => `
+            <div class="card" style="background: var(--surface-subtle); cursor: pointer;" onclick="openSpecificLesson(${l.id})">
+              <h4>${idx + 1}. ${l.title}</h4>
+              <span style="font-size: 0.9rem; color: var(--text-muted);">${l.original_name || ''}</span>
+              <div style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--primary); font-weight: 600;">
+                Learn Topic &rarr;
+              </div>
+            </div>
+          `).join('')}
+        `;
+      } catch (err) {
+        alert('Could not fetch chapter topics: ' + err);
+      }
+    }
+
+    function openSpecificLesson(lesId) {
+      currentLessonId = lesId;
+      showStudentSection('learn');
+      loadActiveLesson(lesId);
+    }
+
+    async function loadActiveLesson(lesId) {
+      const id = lesId || currentLessonId || 1;
+      currentLessonId = id;
+      try {
+        const res = await fetch(`${API_BASE}/lesson/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('activeLessonTitle').innerText = data.title;
+          document.getElementById('activeLessonBreadcrumb').innerText = `${data.subject} • ${data.chapter} • Source: J-Guruji Jharkhand (Class ${data.class_number})`;
+          document.getElementById('studentClassBadge').innerText = `Class ${data.class_number}`;
+          document.getElementById('activeLessonBody').innerHTML = data.content.replace(/\n/g, '<br>');
+          document.getElementById('activeLessonSantali').innerText = data.santali_translation;
+          const actEl = document.getElementById('activeLessonActivities');
+          if (actEl) {
+            actEl.innerHTML = `
+              <strong>Classroom Activities:</strong><br>${(data.activities || 'Hands-on classroom recitation and word building.').replace(/\n/g, '<br>')}<br><br>
+              <strong>Pedagogical Examples:</strong><br>${(data.examples || 'Everyday Jharkhand village and nature examples.').replace(/\n/g, '<br>')}
+            `;
+          }
+          currentGrade = data.class_number || currentGrade;
+        }
+      } catch (err) {
+        console.warn('Could not load active lesson:', err);
+      }
+    }
+
+    async function loadStudentContinueLearning() {
+      if (!currentUser || currentUser.role !== 'student') return;
+      try {
+        const res = await fetch(`${API_BASE}/student/continue-learning?identifier=${currentUser.identifier}`);
+        const data = await res.json();
+        if (data.status === 'SUCCESS' || data.lesson_id) {
+          currentLessonId = data.lesson_id;
+          document.getElementById('activeLessonTitle').innerText = data.title;
+          document.getElementById('activeLessonBreadcrumb').innerText = `${data.subject} • ${data.chapter} • Source: J-Guruji Jharkhand (Class ${data.class_number})`;
+          document.getElementById('activeLessonBody').innerHTML = data.content.replace(/\n/g, '<br>');
+          document.getElementById('activeLessonSantali').innerText = data.santali_translation;
+          const actEl = document.getElementById('activeLessonActivities');
+          if (actEl) {
+            actEl.innerHTML = `
+              <strong>Classroom Activities:</strong><br>${(data.activities || 'Hands-on classroom recitation.').replace(/\n/g, '<br>')}<br><br>
+              <strong>Pedagogical Examples:</strong><br>${(data.examples || 'Local context examples.').replace(/\n/g, '<br>')}
+            `;
+          }
+        }
+      } catch (err) {
+        console.warn('Continue learning load error:', err);
+      }
+    }
+
+    function speakCurrentLesson() {
+      const text = document.getElementById('activeLessonSantali').innerText;
+      playVernacularAudio(text, 'hi');
+    }
+
+    // --- QUIZ INTERACTION ---
+    async function loadLessonQuiz() {
+      studentAnswers = {};
+      document.getElementById('quizFinalResult').innerHTML = '';
+
+      const res = await fetch(`${API_BASE}/generate-quiz`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lesson_id: currentLessonId,
+          class_number: currentGrade,
+          subject: "Mathematics",
+          chapter: "Foundation Unit",
+          language: "Santali"
+        })
+      });
+      currentQuizData = await res.json();
+
+      const qc = document.getElementById('quizContainer');
+      qc.innerHTML = currentQuizData.questions.map((q, idx) => `
+        <div class="card" style="background: var(--surface-subtle); margin-bottom: 1rem;">
+          <p><strong>Q${idx + 1}. ${q.question_text}</strong></p>
+          <div style="margin-top: 0.8rem;">
+            ${['A', 'B', 'C', 'D'].map(opt => `
+              <div class="quiz-option" id="opt_${q.id}_${opt}" onclick="selectQuizOption(${q.id}, '${opt}')">
+                <span><strong>${opt}.</strong> ${q['option_' + opt.toLowerCase()]}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div id="expl_${q.id}" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); display: none;"></div>
+        </div>
+      `).join('');
+    }
+
+    function selectQuizOption(qid, opt) {
+      studentAnswers[qid] = opt;
+      ['A', 'B', 'C', 'D'].forEach(o => {
+        const el = document.getElementById(`opt_${qid}_${o}`);
+        if (el) el.classList.remove('selected');
+      });
+      document.getElementById(`opt_${qid}_${opt}`).classList.add('selected');
+    }
+
+    async function submitQuizAnswers() {
+      if (!currentQuizData) return;
+      let data = null;
+      try {
+        const res = await fetch(`${API_BASE}/quiz/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            student_identifier: currentUser.identifier,
+            quiz_id: currentQuizData.quiz_id,
+            answers: studentAnswers
+          })
+        });
+        if (res.ok) data = await res.json();
+      } catch (err) {
+        console.warn('Network offline, evaluating locally:', err);
+      }
+
+      // If offline, evaluate locally and queue progress for synchronization
+      if (!data) {
+        let correct = 0;
+        const total = currentQuizData.questions.length;
+        const feedback = currentQuizData.questions.map(q => {
+          const sel = studentAnswers[q.id];
+          const isCorr = sel === (q.correct_option || 'A');
+          if (isCorr) correct++;
+          return {
+            question_id: q.id,
+            selected_option: sel,
+            correct_option: q.correct_option || 'A',
+            is_correct: isCorr,
+            explanation: q.explanation || 'Reviewed in offline curriculum mode.'
+          };
+        });
+        const pct = Math.round((correct / total) * 100);
+        data = {
+          status: 'OFFLINE_EVALUATED',
+          total_questions: total,
+          correct_answers: correct,
+          score_percentage: pct,
+          feedback: feedback
+        };
+
+        // Queue progress in local storage
+        const pending = JSON.parse(localStorage.getItem('vernacular_pending_progress') || '[]');
+        pending.push({
+          lesson_id: currentLessonId,
+          is_completed: true,
+          best_score: pct,
+          recorded_at: new Date().toISOString()
+        });
+        localStorage.setItem('vernacular_pending_progress', JSON.stringify(pending));
+      }
+
+      data.feedback.forEach(f => {
+        const qid = f.question_id;
+        ['A', 'B', 'C', 'D'].forEach(o => {
+          const el = document.getElementById(`opt_${qid}_${o}`);
+          if (el) {
+            el.classList.remove('correct', 'incorrect');
+            if (o === f.correct_option) {
+              el.classList.add('correct');
+            } else if (o === f.selected_option && !f.is_correct) {
+              el.classList.add('incorrect');
+            }
+          }
+        });
+        const expl = document.getElementById(`expl_${qid}`);
+        if (expl) {
+          expl.style.display = 'block';
+          expl.innerHTML = f.is_correct 
+            ? `<span style="color: var(--accent-green); font-weight: 600;">✓ Correct!</span> ${f.explanation || ''}`
+            : `<span style="color: #DC2626; font-weight: 600;">✗ Incorrect. Correct Answer: ${f.correct_option}.</span> ${f.explanation || ''}`;
+        }
+      });
+
+      document.getElementById('quizScoreBadge').innerText = `Score: ${data.correct_answers} / ${data.total_questions} (${data.score_percentage}%)`;
+      document.getElementById('quizFinalResult').innerHTML = `
+        <div class="alert ${data.score_percentage >= 60 ? 'alert-success' : 'alert-info'}">
+          <strong>Quiz Completed!</strong> You answered ${data.correct_answers} correctly out of ${data.total_questions} (${data.score_percentage}%). Progress saved to database!
+        </div>
+      `;
+      loadStudentProgress();
+    }
+
+    // --- FLASHCARDS ---
+    async function loadStudentFlashcards() {
+      const res = await fetch(`${API_BASE}/generate-flashcards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: currentLessonId, class_number: currentGrade, subject: "Mother Tongue", chapter: "Vocabulary" })
+      });
+      const data = await res.json();
+      flashcardsList = data.flashcards;
+      currentCardIndex = 0;
+      updateFlashcardView();
+    }
+
+    function flipCard() {
+      document.querySelector('.flashcard').classList.toggle('flipped');
+    }
+
+    function updateFlashcardView() {
+      if (!flashcardsList.length) return;
+      document.querySelector('.flashcard').classList.remove('flipped');
+      const c = flashcardsList[currentCardIndex];
+      document.getElementById('cardCounter').innerText = `Card ${currentCardIndex + 1} of ${flashcardsList.length}`;
+      document.getElementById('fcCategory').innerText = c.category || 'Curriculum Vocabulary';
+      document.getElementById('fcFront').innerText = c.front_text;
+      document.getElementById('fcCategoryBack').innerText = 'Santali Mother Tongue';
+      document.getElementById('fcBack').innerText = c.back_text;
+    }
+
+    function nextCard() {
+      if (currentCardIndex < flashcardsList.length - 1) {
+        currentCardIndex++;
+        updateFlashcardView();
+      }
+    }
+
+    function prevCard() {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        updateFlashcardView();
+      }
+    }
+
+    // --- DOUBTS ---
+    async function askDoubt() {
+      const q = document.getElementById('studentDoubtInput').value.trim();
+      if (!q) return;
+
+      const res = await fetch(`${API_BASE}/ask-doubt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_identifier: currentUser.identifier,
+          lesson_id: currentLessonId,
+          question: q,
+          language: currentUser.preferred_language || "Santali (English)"
+        })
+      });
+      const data = await res.json();
+      document.getElementById('doubtResponseArea').innerHTML = `
+        <div class="card" style="background: var(--surface-subtle); margin-top: 1rem;">
+          <h4>Assistant Explanation for Class ${currentGrade}:</h4>
+          <p style="margin-top: 0.5rem; white-space: pre-wrap; line-height: 1.6;">${data.response}</p>
+          <button class="btn btn-green" style="margin-top: 0.8rem;" onclick="speakSantaliDirect('${data.response.replace(/'/g, "\\'")}')">🔊 Listen to Explanation</button>
+        </div>
+      `;
+    }
+
+    // --- PROGRESS & SYNC ---
+    async function loadStudentProgress() {
+      if (!currentUser || currentUser.role !== 'student') return;
+      const res = await fetch(`${API_BASE}/student/progress?identifier=${currentUser.identifier}`);
+      const data = await res.json();
+      document.getElementById('progLessonsCount').innerText = data.total_lessons_completed;
+      document.getElementById('progQuizzesCount').innerText = data.total_quizzes_taken;
+      document.getElementById('progAvgScore').innerText = `${data.average_score}%`;
+    }
+
+    // --- TEACHER STATS & OFFLINE ---
+    async function loadTeacherStats() {
+      if (!currentUser || currentUser.role !== 'teacher') return;
+      try {
+        const res = await fetch(`${API_BASE}/teacher/stats?identifier=${currentUser.identifier}`);
+        if (res.ok) {
+          const stats = await res.json();
+          if (document.getElementById('statLessonsPrepared')) document.getElementById('statLessonsPrepared').innerText = stats.lessons_prepared;
+          if (document.getElementById('statDrafts')) document.getElementById('statDrafts').innerText = stats.drafts;
+          if (document.getElementById('statPublished')) document.getElementById('statPublished').innerText = stats.published;
+          if (document.getElementById('statPendingSync')) document.getElementById('statPendingSync').innerText = stats.pending_sync;
+        }
+      } catch (err) {
+        console.warn('Teacher stats offline:', err);
+      }
+    }
+
+    function updateTeacherOfflineStats() {
+      const offlineLessons = JSON.parse(localStorage.getItem('vernacular_offline_lessons') || '[]');
+      const queuedActions = JSON.parse(localStorage.getItem('vernacular_sync_queue') || '[]');
+      if (document.getElementById('cachedLessonsCount')) document.getElementById('cachedLessonsCount').innerText = offlineLessons.length;
+      if (document.getElementById('queuedActionsCount')) document.getElementById('queuedActionsCount').innerText = queuedActions.length;
+    }
+
+    // --- PROFILE MODAL MANAGEMENT ---
+    function openProfileModal() {
+      if (!currentUser) return;
+      document.getElementById('profileNameInput').value = currentUser.name || '';
+      document.getElementById('profileSchoolInput').value = currentUser.school || '';
+      document.getElementById('profileLangSelect').value = currentUser.preferred_language || 'Santali (English)';
+      
+      const isStudent = currentUser.role === 'student';
+      document.getElementById('profileClassGroup').style.display = isStudent ? 'block' : 'none';
+      if (isStudent) {
+        document.getElementById('profileClassSelect').value = currentGrade || 3;
+      }
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+
+    async function saveUserProfile() {
+      if (!currentUser) return;
+      const name = document.getElementById('profileNameInput').value.trim();
+      const school = document.getElementById('profileSchoolInput').value.trim();
+      const lang = document.getElementById('profileLangSelect').value;
+      const cls = parseInt(document.getElementById('profileClassSelect').value);
+
+      const endpoint = currentUser.role === 'teacher' ? `${API_BASE}/teacher/profile` : `${API_BASE}/student/profile`;
+      try {
+        const res = await fetch(`${endpoint}?identifier=${currentUser.identifier}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            school: school,
+            preferred_language: lang,
+            class_number: cls
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser.name = data.user.name;
+          currentUser.school = data.user.school;
+          currentUser.preferred_language = data.user.preferred_language;
+          if (data.user.class_number) currentGrade = data.user.class_number;
+
+          document.getElementById('userNameBadge').innerText = `Welcome, ${currentUser.name}`;
+          if (currentUser.role === 'teacher') {
+            document.getElementById('teacherHomeWelcome').innerText = `Welcome ${currentUser.name}`;
+            if (document.getElementById('teacherHomeSchool')) document.getElementById('teacherHomeSchool').innerText = currentUser.school;
+            if (document.getElementById('teacherHomeLang')) document.getElementById('teacherHomeLang').innerText = currentUser.preferred_language;
+          } else {
+            document.getElementById('studentHomeWelcome').innerText = `Welcome ${currentUser.name}`;
+            document.getElementById('studentHomeClass').innerText = `Class ${currentGrade}`;
+            if (document.getElementById('studentHomeSchool')) document.getElementById('studentHomeSchool').innerText = currentUser.school;
+            document.getElementById('studentHomeLang').innerText = currentUser.preferred_language;
+            document.getElementById('studentClassBadge').innerText = `Class ${currentGrade}`;
+          }
+          closeProfileModal();
+          alert('Profile updated successfully!');
+        } else {
+          alert('Failed to update profile.');
+        }
+      } catch (err) {
+        alert('Network error updating profile: ' + err);
+      }
+    }
+
+    // --- STUDENT OFFLINE DOWNLOADS & LOCALSTORAGE ---
+    function downloadActiveLesson() {
+      const lessonTitle = document.getElementById('activeLessonTitle').innerText;
+      const breadcrumb = document.getElementById('activeLessonBreadcrumb').innerText;
+      const body = document.getElementById('activeLessonBody').innerText;
+      const santali = document.getElementById('activeLessonSantali').innerText;
+
+      const item = {
+        lesson_id: currentLessonId,
+        title: lessonTitle,
+        breadcrumb: breadcrumb,
+        body: body,
+        santali: santali,
+        downloaded_at: new Date().toLocaleDateString(),
+        class_number: currentGrade
+      };
+
+      let offlineLessons = JSON.parse(localStorage.getItem('vernacular_offline_lessons') || '[]');
+      const existingIdx = offlineLessons.findIndex(l => l.lesson_id === currentLessonId && l.class_number === currentGrade);
+      if (existingIdx >= 0) {
+        offlineLessons[existingIdx] = item;
+      } else {
+        offlineLessons.push(item);
+      }
+
+      localStorage.setItem('vernacular_offline_lessons', JSON.stringify(offlineLessons));
+      alert(`Lesson '${lessonTitle}' saved to local offline database! You can view it anytime without internet under Downloads.`);
+      loadDownloadedLessons();
+    }
+
+    function loadDownloadedLessons() {
+      const listDiv = document.getElementById('downloadedLessonsList');
+      const qListDiv = document.getElementById('downloadedQuizzesList');
+      const wsListDiv = document.getElementById('downloadedWorksheetsList');
+
+      const offlineLessons = JSON.parse(localStorage.getItem('vernacular_offline_lessons') || '[]');
+      const offlineQuizzes = JSON.parse(localStorage.getItem('vernacular_offline_quizzes') || '[]');
+      const offlineWorksheets = JSON.parse(localStorage.getItem('vernacular_offline_worksheets') || '[]');
+
+      if (document.getElementById('dlLessonsCount')) document.getElementById('dlLessonsCount').innerText = offlineLessons.length;
+      if (document.getElementById('dlQuizzesCount')) document.getElementById('dlQuizzesCount').innerText = offlineQuizzes.length;
+      if (document.getElementById('dlWorksheetsCount')) document.getElementById('dlWorksheetsCount').innerText = offlineWorksheets.length;
+
+      // 1. Lessons
+      if (listDiv) {
+        if (!offlineLessons.length) {
+          listDiv.innerHTML = '<p style="color: var(--text-muted);">No offline lessons downloaded yet. Open any textbook chapter and click 💾 Download Offline.</p>';
+        } else {
+          listDiv.innerHTML = offlineLessons.map(l => `
+            <div class="card" style="background: var(--surface-subtle); margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${l.title}</strong>
+                <span class="sync-status-badge" style="background: var(--accent-green-bg); color: var(--accent-green); margin-left: 0.5rem;">Offline Ready</span>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+                  ${l.breadcrumb} &bull; Saved: ${l.downloaded_at}
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary" onclick="viewDownloadedLesson(${l.lesson_id})">Study Offline</button>
+                <button class="btn btn-secondary" style="color: #DC2626;" onclick="deleteDownloadedLesson(${l.lesson_id})">Delete</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 2. Quizzes
+      if (qListDiv) {
+        if (!offlineQuizzes.length) {
+          qListDiv.innerHTML = '<p style="color: var(--text-muted);">No offline quizzes synchronized yet. Click Synchronize to pull latest offline quizzes.</p>';
+        } else {
+          qListDiv.innerHTML = offlineQuizzes.map(q => `
+            <div class="card" style="background: var(--surface-subtle); margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${q.title}</strong>
+                <span class="sync-status-badge" style="background: var(--accent-green-bg); color: var(--accent-green); margin-left: 0.5rem;">5 Questions Cached</span>
+              </div>
+              <button class="btn btn-green" onclick="playOfflineQuiz(${q.id})">Take Offline Quiz</button>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 3. Worksheets
+      if (wsListDiv) {
+        if (!offlineWorksheets.length) {
+          wsListDiv.innerHTML = '<p style="color: var(--text-muted);">No offline worksheets cached yet. Click Synchronize to pull.</p>';
+        } else {
+          wsListDiv.innerHTML = offlineWorksheets.map(w => `
+            <div class="card" style="background: var(--surface-subtle); margin-bottom: 0.8rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>${w.title}</strong>
+                <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+              </div>
+              <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">${w.instructions || ''}</div>
+              <pre style="margin-top: 0.5rem; background: #fff; padding: 0.8rem; border-radius: 4px; border: 1px solid var(--border); font-size: 0.85rem; white-space: pre-wrap;">${w.content_bilingual}</pre>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function playOfflineQuiz(quizId) {
+      const offlineQuizzes = JSON.parse(localStorage.getItem('vernacular_offline_quizzes') || '[]');
+      const qData = offlineQuizzes.find(q => q.id === quizId);
+      if (qData) {
+        currentQuizData = { quiz_id: qData.id, questions: qData.questions };
+        showStudentSection('quiz');
+        const qc = document.getElementById('quizContainer');
+        qc.innerHTML = qData.questions.map((q, idx) => `
+          <div class="card" style="background: var(--surface-subtle); margin-bottom: 1rem;">
+            <p><strong>Q${idx + 1}. ${q.question_text} (Offline Mode)</strong></p>
+            <div style="margin-top: 0.8rem;">
+              ${['A', 'B', 'C', 'D'].map(opt => `
+                <div class="quiz-option" id="opt_${q.id}_${opt}" onclick="selectQuizOption(${q.id}, '${opt}')">
+                  <span><strong>${opt}.</strong> ${q['option_' + opt.toLowerCase()]}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div id="expl_${q.id}" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); display: none;"></div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function viewDownloadedLesson(lesId) {
+      const offlineLessons = JSON.parse(localStorage.getItem('vernacular_offline_lessons') || '[]');
+      const item = offlineLessons.find(l => l.lesson_id === lesId);
+      if (item) {
+        currentLessonId = item.lesson_id;
+        document.getElementById('activeLessonTitle').innerText = item.title;
+        document.getElementById('activeLessonBreadcrumb').innerText = item.breadcrumb + ' (Offline Cached)';
+        document.getElementById('activeLessonBody').innerText = item.body;
+        document.getElementById('activeLessonSantali').innerText = item.santali;
+        showStudentSection('learn');
+      }
+    }
+
+    function deleteDownloadedLesson(lesId) {
+      let offlineLessons = JSON.parse(localStorage.getItem('vernacular_offline_lessons') || '[]');
+      offlineLessons = offlineLessons.filter(l => l.lesson_id !== lesId);
+      localStorage.setItem('vernacular_offline_lessons', JSON.stringify(offlineLessons));
+      loadDownloadedLessons();
+    }
+
+    function switchDownloadTab(tab) {
+      document.getElementById('tabDlLessons').classList.toggle('active', tab === 'lessons');
+      document.getElementById('tabDlQuizzes').classList.toggle('active', tab === 'quizzes');
+      document.getElementById('tabDlWorksheets').classList.toggle('active', tab === 'worksheets');
+      document.getElementById('viewDlLessons').style.display = tab === 'lessons' ? 'block' : 'none';
+      document.getElementById('viewDlQuizzes').style.display = tab === 'quizzes' ? 'block' : 'none';
+      document.getElementById('viewDlWorksheets').style.display = tab === 'worksheets' ? 'block' : 'none';
+    }
+
+    async function triggerSync() {
+      document.getElementById('syncText').innerText = 'Syncing...';
+      const userIdent = currentUser ? currentUser.identifier : 'student_user';
+      const role = currentUser ? currentUser.role : 'student';
+
+      // Read any pending local offline progress records
+      const pendingProgress = JSON.parse(localStorage.getItem('vernacular_pending_progress') || '[]');
+
+      try {
+        const res = await fetch(`${API_BASE}/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_identifier: userIdent, role: role, progress_records: pendingProgress })
+        });
+        const data = await res.json();
+        localStorage.removeItem('vernacular_pending_progress');
+
+        // Cache offline worksheets if pulled
+        if (data.offline_worksheets) {
+          localStorage.setItem('vernacular_offline_worksheets', JSON.stringify(data.offline_worksheets));
+        }
+        // Cache offline quizzes if pulled
+        if (data.offline_quizzes) {
+          localStorage.setItem('vernacular_offline_quizzes', JSON.stringify(data.offline_quizzes));
+        }
+
+        document.getElementById('syncText').innerText = `Online • Synced (${data.items_pulled} items synchronized)`;
+        alert(`Synchronization Complete!
+• Synchronized Items: ${data.items_pulled}
+• Offline Cache: Updated with latest lessons, worksheets, and quizzes.`);
+        loadDownloadedLessons();
+        if (currentUser && currentUser.role === 'student') loadStudentProgress();
+        if (currentUser && currentUser.role === 'teacher') loadTeacherStats();
+      } catch (err) {
+        document.getElementById('syncText').innerText = 'Offline Mode (Local Storage Active)';
+        alert('Network offline. Application running seamlessly from Local Database storage.');
+      }
+    }
+  </script>
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 id="profileModalTitle">User Profile</h3>
+        <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem; cursor: pointer;" onclick="closeProfileModal()">&times;</button>
+      </div>
+      <label>Full Name</label>
+      <input type="text" id="profileNameInput">
+      <label>School / Institution</label>
+      <input type="text" id="profileSchoolInput">
+      <div id="profileClassGroup" style="display: none;">
+        <label>Class / Grade</label>
+        <select id="profileClassSelect">
+          <option value="1">Class 1</option>
+          <option value="2">Class 2</option>
+          <option value="3">Class 3</option>
+          <option value="4">Class 4</option>
+          <option value="5">Class 5</option>
+        </select>
+      </div>
+      <label>Language Preference</label>
+      <select id="profileLangSelect">
+        <option value="Santali (English)">Santali (English)</option>
+        <option value="Santali (Hindi)">Santali (Hindi)</option>
+        <option value="Hindi">Hindi</option>
+        <option value="English">English</option>
+      </select>
+      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="closeProfileModal()">Cancel</button>
+        <button class="btn btn-green" onclick="saveUserProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
