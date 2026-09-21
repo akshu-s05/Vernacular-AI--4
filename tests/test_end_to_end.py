@@ -97,23 +97,38 @@ class TestVernacularAIPedagogyExtended(unittest.TestCase):
         self.assertIn("mapped_lesson", res_data)
 
     def test_06_translation_word_sentence_chapter(self):
-        # English -> Santali
+        # English -> Santali exact word
         res_word = requests.post(
             f"{BASE_URL}/translate",
             json={"text": "hello", "source_language": "English", "target_language": "Santali"}
         )
         self.assertEqual(res_word.status_code, 200)
-        self.assertIn("Johar", res_word.json()["translated_text"])
+        word_trans = res_word.json()["translated_text"]
+        self.assertIn("Johar", word_trans)
+        self.assertNotIn("[", word_trans)  # No bracketed English meaning leak
 
-        # Sentence translation
+        # English -> Santali sentence translation
         res_sent = requests.post(
             f"{BASE_URL}/translate",
             json={"text": "teacher gives book to student", "source_language": "English", "target_language": "Santali"}
         )
         self.assertEqual(res_sent.status_code, 200)
-        self.assertIn("Machet", res_sent.json()["translated_text"])
+        sent_trans = res_sent.json()["translated_text"]
+        self.assertIn("Machet", sent_trans)
+        self.assertNotIn("[", sent_trans)  # No bracketed English translation leak
+
+        # Additional English sentence verification
+        res_env = requests.post(
+            f"{BASE_URL}/translate",
+            json={"text": "clean water keeps children healthy and strong.", "source_language": "English", "target_language": "Santali"}
+        )
+        self.assertEqual(res_env.status_code, 200)
+        env_trans = res_env.json()["translated_text"]
+        self.assertNotIn("[", env_trans)
+        self.assertNotIn("Clean water", env_trans)
 
     def test_07_voice_translation_pipeline(self):
+        # 1. Hindi voice pipeline
         res = requests.post(
             f"{BASE_URL}/voice-translate",
             json={
@@ -127,6 +142,22 @@ class TestVernacularAIPedagogyExtended(unittest.TestCase):
         self.assertEqual(data["status"], "SUCCESS")
         self.assertIn("translated_text", data)
         self.assertIn("latency_seconds", data)
+
+        # 2. English voice pipeline (translating English audio transcript into Santali without English leak)
+        res_en = requests.post(
+            f"{BASE_URL}/voice-translate",
+            json={
+                "transcript_text": "Welcome to our classroom, dear students.",
+                "source_language": "English",
+                "target_language": "Santali"
+            }
+        )
+        self.assertEqual(res_en.status_code, 200)
+        data_en = res_en.json()
+        self.assertEqual(data_en["status"], "SUCCESS")
+        self.assertEqual(data_en["source_language"], "English")
+        self.assertNotIn("[", data_en["translated_text"])
+        self.assertNotIn("Welcome to our classroom", data_en["translated_text"])
 
     def test_08_ai_assistant_dynamic_doubt_resolution(self):
         # 1. Santali (English)
@@ -257,6 +288,32 @@ class TestVernacularAIPedagogyExtended(unittest.TestCase):
         self.assertEqual(prog_res.status_code, 200)
         prog_data = prog_res.json()
         self.assertGreaterEqual(prog_data["total_lessons_completed"], 1)
+
+    def test_11_groq_ai_status_and_chat(self):
+        # 1. Test AI status endpoint
+        st_res = requests.get(f"{BASE_URL}/api/ai/status")
+        self.assertEqual(st_res.status_code, 200)
+        st_data = st_res.json()
+        self.assertTrue(st_data["groq_configured"])
+        self.assertEqual(st_data["test_connection"]["status"], "SUCCESS")
+
+        # 2. Test Conversational Chat Box endpoint
+        chat_res = requests.post(
+            f"{BASE_URL}/api/chat",
+            json={
+                "message": "What is school called in Santali?",
+                "user_identifier": "test_student_auto",
+                "class_number": 3,
+                "subject": "Mother Tongue",
+                "chapter": "Classroom Words",
+                "language": "Santali (English)"
+            }
+        )
+        self.assertEqual(chat_res.status_code, 200)
+        chat_data = chat_res.json()
+        self.assertIn("reply", chat_data)
+        self.assertGreater(len(chat_data["reply"]), 5)
+        self.assertEqual(chat_data["source"], "groq_cloud_llm")
 
 if __name__ == "__main__":
     unittest.main()

@@ -268,6 +268,13 @@ PARALLEL_SENTENCE_CORPORA: List[Dict[str, str]] = [
         "rom": "Amak' ayo arang Santali te pharcha ror me.",
         "category": "language"
     },
+    {
+        "en": "teacher gives book to student",
+        "hi": "शिक्षक छात्र को पुस्तक देते हैं।",
+        "ol": "ᱢᱟᱪᱮᱛ ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱴᱷᱮᱱ ᱯᱩᱛᱷᱤ ᱮᱢᱟᱭᱟ᱾",
+        "rom": "Machet pathuwa then puthi emaya.",
+        "category": "classroom"
+    },
 
     # Primary Mathematics & Numeracy (Classes 1-5)
     {
@@ -428,7 +435,7 @@ class TribalSentenceEngine:
                 "rom": "Johar",
                 "en": "Greetings",
                 "hi": "नमस्ते",
-                "full_display": "ᱡᱚᱦᱟᱨ (Greetings)"
+                "full_display": "ᱡᱚᱦᱟᱨ (Johar)"
             }
 
         # Check for direct parallel corpus sentence match
@@ -439,15 +446,15 @@ class TribalSentenceEngine:
                 "rom": matched["rom"],
                 "en": matched["en"],
                 "hi": matched["hi"],
-                "full_display": f"{matched['ol']} ({matched['en']})"
+                "full_display": f"{matched['ol']} ({matched['rom']})"
             }
 
         # Topic-driven sentence synthesizer for J-Guruji curriculum units
         lower = text_clean.lower()
         if any(w in lower for w in ["count", "number", "गिनती", "संख्या", "ᱞᱮᱠᱷᱟ", "ᱮᱞ"]):
-            ol_sent = f"ᱥᱟᱱᱛᱟᱲᱤ ᱛᱮ '{text_clean}' ᱫᱚ ᱟᱹᱰᱤ ᱨᱟᱹᱥᱠᱟᱹ ᱮᱞ ᱞᱮᱠᱷᱟ ᱠᱟᱱᱟ, ᱫᱮᱞᱟᱵᱚᱱ ᱢᱤᱫ ᱥᱟᱶᱛᱮ ᱵᱚᱱ ᱪᱮᱫᱚᱜ-ᱟ᱾"
-            rom_sent = f"Santali te '{text_clean}' do ạḍi rạskạ el lekha kana, delabon mit' sawte bon seṛok'-a."
-            en_trans = f"Learning '{text_clean}' in Santali is joyous counting, let us learn together."
+            ol_sent = "ᱥᱟᱱᱛᱟᱲᱤ ᱛᱮ ᱮᱞ ᱞᱮᱠᱷᱟ ᱫᱚ ᱟᱹᱰᱤ ᱨᱟᱹᱥᱠᱟᱹ ᱠᱟᱱᱟ, ᱫᱮᱞᱟᱵᱚᱱ ᱢᱤᱫ ᱥᱟᱶᱛᱮ ᱵᱚᱱ ᱪᱮᱫᱚᱜ-ᱟ᱾"
+            rom_sent = "Santali te el lekha do ạḍi rạskạ kana, delabon mit' sawte bon seṛok'-a."
+            en_trans = "Learning counting in Santali is joyous, let us learn together."
         elif any(w in lower for w in ["addition", "add", "जोड़", "योग", "ᱢᱮᱥᱟ"]):
             ol_sent = "ᱢᱮᱥᱟ ᱨᱮᱭᱟᱜ ᱢᱮᱱᱮᱛ ᱫᱚ ᱞᱮᱠᱷᱟ ᱵᱟᱰᱟᱭ ᱞᱟᱹᱜᱤᱫ ᱡᱤᱱᱤᱥ ᱠᱚ ᱢᱤᱫ ᱴᱷᱮᱱ ᱡᱚᱯᱲᱟᱣ᱾"
             rom_sent = "Mesa reyak' menet' do lekha baday lạgit' jinis ko mit' then jopṛaw."
@@ -465,18 +472,18 @@ class TribalSentenceEngine:
             rom_sent = "Pharcha dak' do abowak' hoṛmo nirok ar ketej e dohoya."
             en_trans = "Clean water keeps our body healthy and strong."
         elif any(w in lower for w in ["school", "classroom", "student", "teacher", "ᱟᱥᱲᱟ", "ᱢᱟᱪᱮᱛ"]):
-            ol_sent = f"ᱟᱥᱲᱟ ᱨᱮ ᱟᱵᱚ ᱢᱟᱪᱮᱛ ᱥᱟᱶ ᱱᱚᱶᱟ ᱯᱟᱲᱦᱟᱣ '{text_clean}' ᱫᱷᱮᱭᱟᱱ ᱛᱮ ᱵᱚᱱ ᱯᱟᱲᱦᱟᱣᱟ᱾"
-            rom_sent = f"Asda re abo Machet saw nowa parhaw '{text_clean}' dhiyan te bon parhawa."
-            en_trans = f"In school, we study this unit '{text_clean}' attentively with the teacher."
+            ol_sent = "ᱟᱥᱲᱟ ᱨᱮ ᱟᱵᱚ ᱢᱟᱪᱮᱛ ᱥᱟᱶ ᱱᱚᱶᱟ ᱯᱟᱲᱦᱟᱣ ᱫᱷᱮᱭᱟᱱ ᱛᱮ ᱵᱚᱱ ᱯᱟᱲᱦᱟᱣᱟ᱾"
+            rom_sent = "Asda re abo Machet saw nowa parhaw dhiyan te bon parhawa."
+            en_trans = "In school, we study this unit attentively with the teacher."
         else:
-            ol_sent = f"ᱱᱚᱶᱟ ᱯᱟᱲᱦᱟᱣ ᱨᱮ ᱟᱵᱚ '{text_clean}' ᱵᱟᱵᱚᱛ ᱟᱹᱰᱤ ᱱᱟᱯᱟᱭ ᱛᱮ ᱵᱚᱱ ᱪᱮᱫᱚᱜ-ᱟ᱾"
-            rom_sent = f"Nowa parhaw re abo '{text_clean}' babot ạḍi napay te bon seṛok'-a."
-            en_trans = f"In this lesson we study foundational knowledge of '{text_clean}' thoroughly."
+            ol_sent = "ᱱᱚᱶᱟ ᱯᱟᱲᱦᱟᱣ ᱨᱮ ᱟᱵᱚ ᱵᱟᱵᱚᱛ ᱟᱹᱰᱤ ᱱᱟᱯᱟᱭ ᱛᱮ ᱵᱚᱱ ᱪᱮᱫᱚᱜ-ᱟ᱾"
+            rom_sent = "Nowa parhaw re abo babot ạḍi napay te bon seṛok'-a."
+            en_trans = "In this lesson we study foundational knowledge thoroughly."
 
         return {
             "ol": ol_sent,
             "rom": rom_sent,
             "en": en_trans,
-            "hi": f"इस पाठ में हम '{text_clean}' को अच्छी तरह सीखेंगे।",
-            "full_display": f"{ol_sent} ({en_trans})"
+            "hi": "इस पाठ में हम अच्छी तरह सीखेंगे।",
+            "full_display": f"{ol_sent} ({rom_sent})"
         }

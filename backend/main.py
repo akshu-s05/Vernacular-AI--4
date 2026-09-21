@@ -5,6 +5,11 @@ import json
 import datetime
 import urllib.parse
 from typing import List, Optional
+from dotenv import load_dotenv
+
+# Ensure environment variables are loaded
+load_dotenv()
+
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -155,6 +160,15 @@ class DoubtRequest(BaseModel):
     lesson_id: int
     question: str
     language: str = "Santali"
+
+class ChatRequest(BaseModel):
+    message: str
+    user_identifier: Optional[str] = "student"
+    class_number: Optional[int] = 3
+    subject: Optional[str] = "General"
+    chapter: Optional[str] = "Curriculum"
+    language: Optional[str] = "Santali (English)"
+    history: Optional[List[dict]] = []
 
 class QuizSubmitRequest(BaseModel):
     student_identifier: str
@@ -741,58 +755,97 @@ async def upload_document(
 # ----------------- TRANSLATION & VOICE TRANSLATE -----------------
 
 def extract_spoken_text(text: str) -> str:
-    """Extract Romanized phonetic pronunciation if inside parentheses/brackets, or Romanize pure Ol Chiki, else return cleaned text."""
+    """Extract Romanized phonetic pronunciation or dynamically transliterate Ol Chiki Santali into phonetic text for TTS."""
     if not text:
         return ""
-    # Look for bracketed romanized phonetic text e.g. "ᱡᱚᱦᱟᱨ (Johar!)"
+    # 1. Look for bracketed romanized phonetic text e.g. "ᱡᱚᱦᱟᱨ (Johar!)"
     matches = re.findall(r"\(([^)]+)\)", text)
     if matches:
-        return " ".join(matches)
+        return " ".join(matches).strip()
     matches_sq = re.findall(r"\[([^\]]+)\]", text)
     if matches_sq:
-        return " ".join(matches_sq)
-    # Check if text is pure/primarily Ol Chiki script ([ᱚ-ᱽ])
+        return " ".join(matches_sq).strip()
+
+    # 2. Check if text has Ol Chiki script characters ([ᱚ-ᱽ])
     if any('\u1C50' <= char <= '\u1C7F' for char in text):
-        # Look up sentence in TribalSentenceEngine
+        # 2a. Direct lookup in parallel tribal sentence corpus
         matched = TribalSentenceEngine.find_corpus_sentence(text)
         if matched and matched.get("rom"):
-            return matched["rom"]
-        # If not direct match, synthesize full sentence phonetic roman
-        syn = TribalSentenceEngine.synthesize_full_sentence(text, "Santali", "Santali")
-        if syn and syn.get("rom"):
-            return syn["rom"]
+            return matched["rom"].strip()
 
-    # Remove Ol Chiki characters if mixed with Latin to prevent TTS speech silence
+        # 2b. Synthesize via dynamic translation to Hindi/phonetic representation
+        try:
+            url = f"https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=sat&tl=hi&q={urllib.parse.quote(text.strip())}"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    if isinstance(data, list) and len(data) > 0 and isinstance(data[0], str) and data[0].strip():
+                        return data[0].strip()
+        except Exception as ex:
+            print(f"Notice: Dynamic phonetic transliteration: {ex}")
+
+        # 2c. Ol Chiki letter-by-letter phonetic transliteration
+        ol_map = {
+            '\u1C5A': 'la', '\u1C5B': 'at', '\u1C5C': 'ag', '\u1C5D': 'ang', '\u1C5E': 'al',
+            '\u1C5F': 'la', '\u1C60': 'aak', '\u1C61': 'aaj', '\u1C62': 'am',  '\u1C63': 'aaw',
+            '\u1C64': 'i',  '\u1C65': 'is', '\u1C66': 'ih',  '\u1C67': 'in',  '\u1C68': 'ir',
+            '\u1C69': 'u',  '\u1C6A': 'uc', '\u1C6B': 'ud',  '\u1C6C': 'uy',  '\u1C6D': 'e',
+            '\u1C6E': 'ep', '\u1C6F': 'ed', '\u1C70': 'en',  '\u1C71': 'er',  '\u1C72': 'o',
+            '\u1C73': 'ot', '\u1C74': 'ob', '\u1C75': 'on',  '\u1C76': 'or',  '\u1C77': 'oh',
+            '\u1C78': '',   '\u1C79': '',   '\u1C7A': '',   '\u1C7B': '',   '\u1C7C': '',
+            '\u1C7D': '',   '\u1C7E': '.',  '\u1C7F': '.'
+        }
+        translit = "".join(ol_map.get(ch, ch) for ch in text)
+        if translit.strip():
+            return translit.strip()
+
+    # 3. Clean Latin words
     latin_words = re.findall(r"[A-Za-z0-9\s.,'?!-]+", text)
     if latin_words and len("".join(latin_words).strip()) > 3:
         return "".join(latin_words).strip()
-    return text
+    return text.strip()
 
 @app.get("/api/tts")
-def stream_tts(text: str, lang: str = "hi"):
+def stream_tts(text: str, santali_text: Optional[str] = None, lang: str = "hi"):
     """
-    Generates dynamic speech audio using gTTS.
-    For Santali mother tongue, extracts phonetic roman transcription to speak via South Asian phonetic model.
+    Generates dynamic speech audio using gTTS from the active Santali text string.
+    Streams live MP3 audio with no-cache headers to guarantee non-static dynamic playback.
     """
-    cleaned = extract_spoken_text(text).strip()
+    input_to_speak = santali_text or text
+    cleaned = extract_spoken_text(input_to_speak).strip()
     if not cleaned:
-        cleaned = text.strip() or "Johar"
+        cleaned = "Johar, Sagun Setag"
 
-    target_lang = "hi" if lang in ["santali", "Santali", "hi", "Hindi"] else ("en" if lang in ["en", "English"] else "hi")
+    # Select TTS phonetic voice
+    has_devanagari = any('\u0900' <= c <= '\u097F' for c in cleaned)
+    target_lang = "hi" if (has_devanagari or lang in ["santali", "Santali", "hi", "Hindi"]) else "en"
 
     try:
         tts = gTTS(text=cleaned, lang=target_lang, slow=False)
         mp3_fp = io.BytesIO()
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
-        return Response(content=mp3_fp.read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=3600"})
+        return Response(
+            content=mp3_fp.read(),
+            media_type="audio/mpeg",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
+        )
     except Exception as e:
         try:
             tts = gTTS(text=cleaned, lang="en", slow=False)
             mp3_fp = io.BytesIO()
             tts.write_to_fp(mp3_fp)
             mp3_fp.seek(0)
-            return Response(content=mp3_fp.read(), media_type="audio/mpeg")
+            return Response(
+                content=mp3_fp.read(),
+                media_type="audio/mpeg",
+                headers={"Cache-Control": "no-cache"}
+            )
         except Exception:
             raise HTTPException(status_code=500, detail=f"TTS synthesis error: {str(e)}")
 
@@ -808,7 +861,8 @@ def voice_translate_endpoint(req: VoiceTranslateRequest):
     elapsed_sec = (datetime.datetime.utcnow() - start_time).total_seconds()
 
     trans_text = trans_res.get("translated_text", "")
-    tts_url = f"/api/tts?text={urllib.parse.quote(trans_text)}&lang=hi"
+    ts_now = int(datetime.datetime.utcnow().timestamp() * 1000)
+    tts_url = f"/api/tts?santali_text={urllib.parse.quote(trans_text)}&text={urllib.parse.quote(trans_text)}&lang=hi&_t={ts_now}"
 
     return {
         "status": "SUCCESS",
@@ -975,6 +1029,116 @@ def ask_doubt_endpoint(req: DoubtRequest, db: Session = Depends(get_db)):
     db.commit()
 
     return res
+
+# ----------------- AI CHAT & STATUS ENDPOINTS -----------------
+
+@app.get("/api/ai/status")
+def get_ai_status():
+    """
+    Returns Groq LLM API connection status, configured model, IndicTrans2 diagnostic test, and connection info.
+    """
+    test_result = AIService.test_groq_connection()
+    indictrans_test = AIService.test_indictrans2_model()
+    return {
+        "groq_configured": bool(os.getenv("GROQ_API_KEY")),
+        "groq_model": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
+        "test_connection": test_result,
+        "indictrans2_santali_engine": indictrans_test
+    }
+
+@app.post("/api/chat")
+def chat_endpoint(req: ChatRequest, db: Session = Depends(get_db)):
+    """
+    Conversational AI Chat endpoint powered by IndicTrans2 and Groq LLM.
+    Automatically translates Santali student doubts into English for grounded pedagogical reasoning,
+    and returns rich bilingual guidance with Santali Ol Chiki terminology.
+    """
+    q_clean = req.message.strip()
+    if not q_clean:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+
+    cls = req.class_number or 3
+    subj = req.subject or "General"
+    chap = req.chapter or "Curriculum"
+    lang = req.language or "Santali (English)"
+
+    # Detect if user question contains Santali Ol Chiki or Santali vocabulary
+    has_olchiki = any('\u1C50' <= c <= '\u1C7F' for c in q_clean)
+    santali_trans = None
+    translated_english_query = ""
+
+    if has_olchiki or "santali" in lang.lower():
+        santali_trans = AIService.translate_santali_to_english_indictrans2(q_clean)
+        translated_english_query = santali_trans.get("english", "")
+
+    # Build prompt messages for Groq
+    sys_prompt = (
+        f"You are 'Vernacular AI Guru', a warm, cheerful, and encouraging educational tutor for primary school students (Class 1 to 5) in Jharkhand, India. "
+        f"You are helping a Class {cls} student in {subj} ('{chap}'). "
+        f"Primary language of instruction: {lang}. "
+        f"Guidelines:\n"
+        f"1. Greet warmly with 'Johar! (ᱡᱚᱦᱟᱨ)'.\n"
+        f"2. Keep explanations clear, simple, friendly, and structured for young children with easy examples.\n"
+        f"3. When using Santali or Hindi terms, use them naturally in sentences with their English or Hindi meaning. DO NOT repeat words or phrases in a loop.\n"
+        f"4. Directly answer the student's question concisely."
+    )
+
+    llm_messages = [{"role": "system", "content": sys_prompt}]
+    if req.history:
+        for h in req.history[-6:]:  # Keep last 6 turns for context
+            role = h.get("role", "user")
+            content = h.get("content", "")
+            if role in ["user", "assistant"] and content:
+                llm_messages.append({"role": role, "content": content})
+
+    user_query_content = q_clean
+    if translated_english_query and has_olchiki:
+        user_query_content = (
+            f"Student Question (Santali Ol Chiki): {q_clean}\n"
+            f"[IndicTrans2 English Translation: \"{translated_english_query}\"]\n"
+            f"Please address this question warmly with simple explanations and Santali/English context."
+        )
+
+    llm_messages.append({"role": "user", "content": user_query_content})
+
+    reply = AIService.call_groq_llm(llm_messages, temperature=0.6, max_tokens=450)
+
+    source = "groq_cloud_llm"
+    if not reply:
+        # Fallback to local rule-based curriculum engine
+        rule_res = AIService.resolve_doubt(
+            class_number=cls,
+            subject=subj,
+            chapter=chap,
+            student_question=q_clean,
+            language=lang
+        )
+        reply = rule_res["response"]
+        source = "local_curriculum_engine"
+
+    # If student exists, optionally persist to Doubts history
+    user = db.query(User).filter_by(identifier=req.user_identifier).first()
+    if user:
+        doubt_rec = Doubt(
+            student_id=user.id,
+            lesson_id=1,
+            question_text=q_clean,
+            response_text=reply,
+            answered_at=datetime.datetime.utcnow()
+        )
+        db.add(doubt_rec)
+        db.commit()
+
+    return {
+        "reply": reply,
+        "source": source,
+        "model": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b") if source == "groq_cloud_llm" else "curriculum_rule_grounded",
+        "santali_translation": santali_trans,
+        "class_number": cls,
+        "subject": subj,
+        "chapter": chap,
+        "language": lang
+    }
 
 # ----------------- QUIZ SUBMISSION & PROGRESS -----------------
 

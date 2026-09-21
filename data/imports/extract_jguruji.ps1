@@ -58,7 +58,10 @@ foreach ($item in $linksToFetch) {
     $processed++
     Write-Host "[$processed/$($linksToFetch.Count)] Fetching $($item.Subject) (Class $($item.Class)) from: $($item.Url)..."
     try {
-        $detailHtml = $wc.DownloadString($item.Url)
+        $detailHtml = $wc.DownloadString($item.Url
+        
+        
+        )
 
         # Parse table headers to find column indices
         $thMatches = [regex]::Matches($detailHtml, '(?s)<th[^>]*>(.*?)</th>')

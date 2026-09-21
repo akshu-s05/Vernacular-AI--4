@@ -413,6 +413,20 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
       onTap: () {
         if (isLogout) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
+        } else if (title == 'AI Assistant') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DoubtChatScreen(user: widget.user),
+            ),
+          );
+        } else if (title == 'Translate') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const TeacherTranslateScreen(),
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Switched to $title')));
         }
@@ -504,6 +518,13 @@ class StudentHomeScreen extends StatelessWidget {
       onTap: () {
         if (isLogout) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
+        } else if (title == 'Ask Doubt') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DoubtChatScreen(user: user),
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Opened $title')));
         }
@@ -528,6 +549,402 @@ class StudentHomeScreen extends StatelessWidget {
                   Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isLogout ? Colors.red : Colors.black87)),
                   Text(subtitle, style: const TextStyle(fontSize: 10, color: Colors.grey), overflow: TextOverflow.ellipsis),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Student & Teacher AI Interactive Chat Screen
+class DoubtChatScreen extends StatefulWidget {
+  final Map<String, dynamic> user;
+  const DoubtChatScreen({super.key, required this.user});
+
+  @override
+  State<DoubtChatScreen> createState() => _DoubtChatScreenState();
+}
+
+class _DoubtChatScreenState extends State<DoubtChatScreen> {
+  final TextEditingController _inputController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final List<Map<String, String>> _messages = [
+    {
+      'role': 'assistant',
+      'content': 'ᱡᱚᱦᱟᱨ (Johar)! I am your Vernacular AI Guru powered by Groq. Ask me any doubt about your syllabus, words, numbers, or lessons in Santali, Hindi, or English!'
+    }
+  ];
+  bool _isLoading = false;
+  String _engineStatus = 'Groq Cloud LLM Active';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkStatus();
+  }
+
+  Future<void> _checkStatus() async {
+    try {
+      final st = await ApiService.getAiStatus();
+      if (mounted) {
+        setState(() {
+          if (st['groq_configured'] == true) {
+            _engineStatus = '⚡ Groq Cloud LLM (${st['groq_model'] ?? 'Online'})';
+          } else {
+            _engineStatus = 'Local Rule Engine (Offline Mode)';
+          }
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _sendMessage() async {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _messages.add({'role': 'user', 'content': text});
+      _isLoading = true;
+    });
+    _inputController.clear();
+    _scrollToBottom();
+
+    try {
+      final res = await ApiService.sendChatMessage(
+        message: text,
+        studentIdentifier: widget.user['identifier'] ?? 'student',
+        classNumber: widget.user['class_number'] ?? 3,
+        language: widget.user['preferred_language'] ?? 'Santali (English)',
+        history: _messages,
+      );
+
+      final reply = res['reply'] ?? 'Could not process query.';
+      if (mounted) {
+        setState(() {
+          _messages.add({'role': 'assistant', 'content': reply});
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add({'role': 'assistant', 'content': 'Error: $e'});
+        });
+        _scrollToBottom();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cls = widget.user['class_number'] ?? 3;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Vernacular AI Guru (Class $cls)'),
+        backgroundColor: const Color(0xFF166534),
+        foregroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(24),
+          child: Container(
+            color: const Color(0xFF14532D),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+            child: Text(
+              _engineStatus,
+              style: const TextStyle(fontSize: 11, color: Color(0xFF86EFAC), fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(12),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final m = _messages[index];
+                final isUser = m['role'] == 'user';
+                return Align(
+                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.82),
+                    decoration: BoxDecoration(
+                      color: isUser ? const Color(0xFF166534) : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: isUser ? null : Border.all(color: Colors.grey.shade300),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isUser ? 'You' : 'Vernacular AI Tutor',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: isUser ? const Color(0xFFBBF7D0) : const Color(0xFF166534),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          m['content'] ?? '',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isUser ? Colors.white : Colors.black87,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4),
+              child: LinearProgressIndicator(color: Color(0xFF166534)),
+            ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Colors.grey.shade300)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _inputController,
+                    decoration: const InputDecoration(
+                      hintText: 'Type your doubt...',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    onSubmitted: (_) => _sendMessage(),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send, color: Color(0xFF166534)),
+                  onPressed: _isLoading ? null : _sendMessage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Teacher Translation Screen matching the Web UI
+class TeacherTranslateScreen extends StatefulWidget {
+  const TeacherTranslateScreen({super.key});
+
+  @override
+  State<TeacherTranslateScreen> createState() => _TeacherTranslateScreenState();
+}
+
+class _TeacherTranslateScreenState extends State<TeacherTranslateScreen> {
+  final TextEditingController _inputController = TextEditingController();
+  String _sourceLang = 'English';
+  String _targetLang = 'Santali';
+  String _translationResult = 'Translation will appear here...';
+  String _engineStatus = 'Engine: Ready';
+  bool _isLoading = false;
+
+  Future<void> _performTranslation() async {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _translationResult = 'Translating...';
+    });
+
+    try {
+      final res = await ApiService.translateText(text, _sourceLang, _targetLang);
+      setState(() {
+        _translationResult = res['translated_text'] ?? 'No translation returned';
+        final engine = res['engine'] ?? 'Bhashini / Cloud Translation API (sat)';
+        final status = res['status'] ?? 'SUCCESS';
+        _engineStatus = 'Engine: $engine | Status: $status';
+      });
+    } catch (e) {
+      setState(() {
+        _translationResult = 'Translation failed: $e';
+        _engineStatus = 'Error occurred during request';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('English / Hindi → Santali Translation Core'),
+        backgroundColor: const Color(0xFF854D0E),
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Source Language',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: _sourceLang,
+                      items: const [
+                        DropdownMenuItem(value: 'English', child: Text('English')),
+                        DropdownMenuItem(value: 'Hindi', child: Text('Hindi')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => _sourceLang = val);
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Input Text',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _inputController,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        hintText: 'e.g. Good morning, Have a great day, or lessons in nature...',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF854D0E),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: _isLoading ? null : _performTranslation,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : const Text('Translate Now', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Target Language',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: _targetLang,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Santali',
+                          child: Text('Santali (ᱚᱞ ᱪᱤᱠᱤ / Ol Chiki)'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'English',
+                          child: Text('English'),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => _targetLang = val);
+                      },
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Santali Translation Result',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: SelectableText(
+                        _translationResult,
+                        style: const TextStyle(fontSize: 16, height: 1.5),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _engineStatus,
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

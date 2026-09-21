@@ -118,4 +118,40 @@ class ApiService {
     }
     return {'lessons_prepared': 0, 'drafts': 0, 'published': 0, 'pending_sync': 0};
   }
+
+  static Future<Map<String, dynamic>> sendChatMessage({
+    required String message,
+    required String studentIdentifier,
+    int classNumber = 3,
+    String subject = "General",
+    String chapter = "Curriculum",
+    String language = "Santali (English)",
+    List<Map<String, String>> history = const [],
+  }) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/api/chat'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'message': message,
+        'user_identifier': studentIdentifier,
+        'class_number': classNumber,
+        'subject': subject,
+        'chapter': chapter,
+        'language': language,
+        'history': history,
+      }),
+    );
+    if (res.statusCode == 200) {
+      return jsonDecode(utf8.decode(res.bodyBytes));
+    }
+    throw Exception('Failed to get chat response: ${res.statusCode}');
+  }
+
+  static Future<Map<String, dynamic>> getAiStatus() async {
+    final res = await http.get(Uri.parse('$baseUrl/api/ai/status'));
+    if (res.statusCode == 200) {
+      return jsonDecode(utf8.decode(res.bodyBytes));
+    }
+    return {'groq_configured': false};
+  }
 }

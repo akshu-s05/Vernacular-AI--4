@@ -240,6 +240,90 @@
     .alert-info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
     .alert-success { background: var(--accent-green-bg); border: 1px solid #86EFAC; color: var(--accent-green); }
 
+    /* Interactive Chat Box Styles */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      overflow: hidden;
+      margin-top: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .chat-header {
+      background: linear-gradient(135deg, #78350F 0%, #B45309 100%);
+      color: #FFFFFF;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 1.2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      background: #FDFCF7;
+    }
+    .chat-msg {
+      max-width: 82%;
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      word-wrap: break-word;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: #854D0E;
+      color: #FFFFFF;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.assistant {
+      align-self: flex-start;
+      background: #FFFFFF;
+      color: #1F2937;
+      border: 1px solid #E5E7EB;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .chat-meta {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .chat-input-bar {
+      padding: 0.75rem 1rem;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .chat-input-bar input {
+      margin: 0;
+      flex: 1;
+      border-radius: 24px;
+      padding: 0.7rem 1.1rem;
+    }
+    .chat-input-bar button {
+      border-radius: 24px;
+      padding: 0.7rem 1.2rem;
+      white-space: nowrap;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .modal {
       display: none;
       position: fixed;
@@ -637,7 +721,14 @@
         <div class="card">
           <h3>Real-Time Voice-to-Voice Translation Architecture</h3>
           <div class="alert alert-info">
-            Pipeline: Teacher Speech &rarr; ASR (Speech-to-Text) &rarr; Translation Engine &rarr; Santali TTS Audio Synthesis.
+            Pipeline: Teacher Speech (English/Hindi) &rarr; ASR (Speech-to-Text) &rarr; Vernacular Santali Translation &rarr; Santali TTS Audio Synthesis.
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+            <label style="margin-bottom: 0; font-weight: 600;">Spoken Language:</label>
+            <select id="voiceSrcLang" style="width: auto; margin-bottom: 0;" onchange="updateVoicePlaceholder()">
+              <option value="English">English (en-IN)</option>
+              <option value="Hindi" selected>Hindi (hi-IN)</option>
+            </select>
           </div>
           <label>Speech Input Transcript</label>
           <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
@@ -887,20 +978,53 @@
         </div>
       </div>
 
-      <!-- STUDENT: DOUBTS -->
+      <!-- STUDENT: DOUBTS / CHATBOX -->
       <div id="secStudentDoubts" style="display: none;">
         <div class="card">
-          <h3>Curriculum Doubt Assistant</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-            Ask any question regarding your current lesson. The assistant responds with personalized explanations grounded in your syllabus.
-          </p>
-          <label>Type or Speak Your Doubt</label>
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-            <input type="text" id="studentDoubtInput" placeholder="e.g. संख्या को संथाली में कैसे गिनते हैं?" style="margin-bottom: 0;">
-            <button class="btn btn-secondary" onclick="startStudentSpeechInput()">🎙️ Speak Doubt</button>
-            <button class="btn btn-green" onclick="askDoubt()">Ask AI</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>💬 Vernacular AI Interactive Chat Box</span>
+                <span class="sync-status-badge" id="chatEngineBadge" style="background: var(--accent-green-bg); color: var(--accent-green); font-size: 0.75rem;">
+                  ⚡ Groq Cloud LLM Active
+                </span>
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">
+                Real-time mother tongue pedagogical tutor. Ask doubts in Santali, Hindi, or English — powered by Groq and grounded in J-Guruji syllabus.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.4rem;">
+              <button class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;" onclick="testGroqApiKeyUI()">🔌 Test API Key</button>
+              <button class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;" onclick="clearChatHistory()">🗑️ Clear Chat</button>
+            </div>
           </div>
-          <div id="doubtResponseArea"></div>
+
+          <div class="chat-container">
+            <div class="chat-header">
+              <span style="font-weight: 600; font-size: 0.9rem;">
+                👨‍🏫 <span id="chatHeaderTitle">Classroom AI Assistant &bull; Class 3</span>
+              </span>
+              <span style="font-size: 0.8rem; opacity: 0.9;" id="chatStatusText">
+                🟢 Online & Ready
+              </span>
+            </div>
+            <div class="chat-messages" id="chatMessagesArea">
+              <!-- Welcome Initial Message -->
+              <div class="chat-msg assistant">
+                <div><strong>ᱡᱚᱦᱟᱨ (Johar)!</strong> I am your Vernacular AI Guru. Ask me any doubt about your textbook, lessons, numbers, words, or concepts in Santali, Hindi, or English!</div>
+                <div class="chat-meta">
+                  <span>🤖 J-Guruji Primary Assistant</span>
+                  <button class="btn btn-secondary" style="padding: 0.1rem 0.4rem; font-size: 0.7rem;" onclick="speakSantaliDirect('Johar! I am your Vernacular AI Guru. Ask me any doubt!')">🔊 Listen</button>
+                </div>
+              </div>
+            </div>
+            <form class="chat-input-bar" onsubmit="event.preventDefault(); askDoubt();" style="margin: 0; padding: 0.75rem 1rem;">
+              <input type="text" id="studentDoubtInput" placeholder="Type your doubt in Santali (ᱚᱞ ᱪᱤᱠᱤ), Hindi, or English... Press Enter to send" autocomplete="off" onkeydown="if(event.key==='Enter'||event.keyCode===13){event.preventDefault(); askDoubt();}">
+              <button type="button" class="btn btn-secondary" onclick="startStudentSpeechInput()" title="Speak doubt with microphone">🎙️</button>
+              <button type="submit" class="btn btn-green" id="chatSendBtn">Send ✈️</button>
+            </form>
+          </div>
+          <div id="doubtResponseArea" style="display: none;"></div>
         </div>
       </div>
 
@@ -1640,7 +1764,12 @@
       if (sec === 'subjects') { document.getElementById('secStudentSubjects').style.display = 'block'; loadStudentSubjects(); }
       if (sec === 'quiz') { document.getElementById('secStudentQuiz').style.display = 'block'; loadLessonQuiz(); }
       if (sec === 'flashcards') { document.getElementById('secStudentFlashcards').style.display = 'block'; loadStudentFlashcards(); }
-      if (sec === 'doubts') document.getElementById('secStudentDoubts').style.display = 'block';
+      if (sec === 'doubts') {
+        document.getElementById('secStudentDoubts').style.display = 'block';
+        const titleEl = document.getElementById('chatHeaderTitle');
+        if (titleEl) titleEl.innerText = `Classroom AI Assistant • Class ${currentGrade || 3}`;
+        checkGroqStatus();
+      }
       if (sec === 'progress') { document.getElementById('secStudentProgress').style.display = 'block'; loadStudentProgress(); }
       if (sec === 'downloads') {
         const dl = document.getElementById('secStudentDownloads');
@@ -1851,9 +1980,11 @@
 
       try {
         globalAudioPlayer.pause();
-        // Point directly to backend TTS endpoint
+        globalAudioPlayer.currentTime = 0;
+        // Point directly to dynamic backend TTS endpoint with timestamp cache-busting
         const cleanForAudio = text.replace(/[\n\r]+/g, ' ').trim();
-        const ttsUrl = `${API_BASE}/api/tts?text=${encodeURIComponent(cleanForAudio)}&lang=${lang}`;
+        const ts = Date.now();
+        const ttsUrl = `${API_BASE}/api/tts?santali_text=${encodeURIComponent(cleanForAudio)}&text=${encodeURIComponent(cleanForAudio)}&lang=${lang}&_t=${ts}`;
         globalAudioPlayer.src = ttsUrl;
 
         globalAudioPlayer.onended = () => {
@@ -1867,6 +1998,34 @@
         });
       } catch (err) {
         speakWithSpeechSynthesis(text);
+      }
+    }
+
+    function playDirectAudioUrl(url, fallbackText = '') {
+      if (!url) return;
+      const statusEl = document.getElementById('audioPlayingStatus');
+      if (statusEl) { statusEl.style.display = 'inline-flex'; }
+
+      try {
+        globalAudioPlayer.pause();
+        globalAudioPlayer.currentTime = 0;
+        // Ensure cache-busting timestamp
+        const directUrl = url.includes('_t=') ? url : `${url}&_t=${Date.now()}`;
+        globalAudioPlayer.src = directUrl;
+
+        globalAudioPlayer.onended = () => {
+          if (statusEl) statusEl.style.display = 'none';
+        };
+        globalAudioPlayer.onerror = () => {
+          if (fallbackText) speakWithSpeechSynthesis(fallbackText);
+          else if (statusEl) statusEl.style.display = 'none';
+        };
+        globalAudioPlayer.play().catch(() => {
+          if (fallbackText) speakWithSpeechSynthesis(fallbackText);
+          else if (statusEl) statusEl.style.display = 'none';
+        });
+      } catch (err) {
+        if (fallbackText) speakWithSpeechSynthesis(fallbackText);
       }
     }
 
@@ -1900,13 +2059,24 @@
     }
 
     // --- VOICE RECOGNITION (SPEECH INPUT) ---
+    function updateVoicePlaceholder() {
+      const srcLang = document.getElementById('voiceSrcLang')?.value || 'Hindi';
+      const inputEl = document.getElementById('voiceTextInput');
+      if (srcLang === 'English') {
+        inputEl.value = 'Welcome to our school, today we will learn about trees and nature.';
+      } else {
+        inputEl.value = 'नमस्ते बच्चों, आज हम विद्यालय में प्रकृति और पेड़ों के बारे में पढ़ेंगे।';
+      }
+    }
+
     function startTeacherSpeechInput() {
       const inputEl = document.getElementById('voiceTextInput');
+      const srcLang = document.getElementById('voiceSrcLang')?.value || 'Hindi';
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         const rec = new SpeechRec();
-        rec.lang = 'hi-IN';
-        inputEl.placeholder = '🎙️ Listening... Please speak in Hindi or English...';
+        rec.lang = (srcLang === 'English') ? 'en-IN' : 'hi-IN';
+        inputEl.placeholder = `🎙️ Listening... Please speak clearly in ${srcLang}...`;
         rec.start();
         rec.onresult = function(e) {
           inputEl.value = e.results[0][0].transcript;
@@ -1946,27 +2116,37 @@
         alert('Please enter or speak a phrase to translate.');
         return;
       }
+      // Determine or auto-detect source language: check selector or Latin vs Devanagari
+      let srcLang = document.getElementById('voiceSrcLang')?.value || 'Hindi';
+      if (/[a-zA-Z]/.test(text) && !/[\u0900-\u097F]/.test(text)) {
+        srcLang = 'English';
+      } else if (/[\u0900-\u097F]/.test(text)) {
+        srcLang = 'Hindi';
+      }
+
       document.getElementById('voiceResult').innerHTML = '<div class="alert alert-info">Processing real-time speech pipeline & synthesizing audio...</div>';
       try {
         const res = await fetch(`${API_BASE}/voice-translate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ transcript_text: text, source_language: 'Hindi', target_language: 'Santali' })
+          body: JSON.stringify({ transcript_text: text, source_language: srcLang, target_language: 'Santali' })
         });
         const data = await res.json();
+        const audioUrl = data.audio_tts_url || `${API_BASE}/api/tts?santali_text=${encodeURIComponent(data.translated_text)}&lang=hi&_t=${Date.now()}`;
         document.getElementById('voiceResult').innerHTML = `
           <div class="card" style="background: var(--surface-subtle); margin-top: 1rem;">
             <h4>Voice Pipeline Completed (Measured Latency: ${data.latency_seconds}s)</h4>
+            <p style="margin-top: 0.5rem;"><strong>Source Language:</strong> <span class="badge" style="background: var(--primary-light); color: var(--primary);">${data.source_language}</span></p>
             <p style="margin-top: 0.5rem;"><strong>Input Speech:</strong> ${data.input_transcript}</p>
             <p style="margin-top: 0.5rem;"><strong>Santali Ol Chiki Translation:</strong> <span class="ol-chiki" style="font-size: 1.15rem; color: var(--primary);">${data.translated_text}</span></p>
             <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
-              <button class="btn btn-green" onclick="playVernacularAudio('${data.translated_text.replace(/'/g, "\\'")}', 'hi')">🔊 Play Voice Audio (Santali)</button>
-              <span style="font-size: 0.85rem; color: var(--accent-green); font-weight: 600;">✓ Audio Synthesized</span>
+              <button class="btn btn-green" onclick="playDirectAudioUrl('${audioUrl}', '${data.translated_text.replace(/'/g, "\\'")}')">🔊 Play Voice Audio (Santali)</button>
+              <span style="font-size: 0.85rem; color: var(--accent-green); font-weight: 600;">✓ Dynamic Audio Synthesized</span>
             </div>
           </div>
         `;
-        // Auto-play synthesized speech audio
-        playVernacularAudio(data.translated_text, 'hi');
+        // Auto-play dynamically synthesized speech audio
+        playDirectAudioUrl(audioUrl, data.translated_text);
       } catch (err) {
         document.getElementById('voiceResult').innerHTML = `<div class="alert" style="background: #FEE2E2; color: #991B1B;">Voice translation failed: ${err}</div>`;
       }
@@ -2341,29 +2521,226 @@ ${data.content_bilingual}
       }
     }
 
-    // --- DOUBTS ---
-    async function askDoubt() {
-      const q = document.getElementById('studentDoubtInput').value.trim();
-      if (!q) return;
+    // --- CHAT BOX & DOUBTS ---
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-      const res = await fetch(`${API_BASE}/ask-doubt`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          student_identifier: currentUser.identifier,
-          lesson_id: currentLessonId,
-          question: q,
-          language: currentUser.preferred_language || "Santali (English)"
-        })
-      });
-      const data = await res.json();
-      document.getElementById('doubtResponseArea').innerHTML = `
-        <div class="card" style="background: var(--surface-subtle); margin-top: 1rem;">
-          <h4>Assistant Explanation for Class ${currentGrade}:</h4>
-          <p style="margin-top: 0.5rem; white-space: pre-wrap; line-height: 1.6;">${data.response}</p>
-          <button class="btn btn-green" style="margin-top: 0.8rem;" onclick="speakSantaliDirect('${data.response.replace(/'/g, "\\'")}')">🔊 Listen to Explanation</button>
-        </div>
-      `;
+    let chatConversationHistory = [];
+    let activeSubjectData = null;
+    let activeLessonData = null;
+
+    async function checkGroqStatus() {
+      try {
+        const res = await fetch(`${API_BASE}/api/ai/status`);
+        if (res.ok) {
+          const data = await res.json();
+          const badge = document.getElementById('chatEngineBadge');
+          if (badge) {
+            if (data.groq_configured && data.test_connection && data.test_connection.status === 'SUCCESS') {
+              badge.innerText = `⚡ Groq Cloud LLM (${data.groq_model})`;
+              badge.style.background = 'var(--accent-green-bg)';
+              badge.style.color = 'var(--accent-green)';
+            } else {
+              badge.innerText = `Offline Rule Engine (Local)`;
+              badge.style.background = 'var(--surface-subtle)';
+              badge.style.color = 'var(--text-muted)';
+            }
+          }
+        }
+      } catch (e) {
+        console.log('Status check defer:', e);
+      }
+    }
+
+    function clearChatHistory() {
+      chatConversationHistory = [];
+      const area = document.getElementById('chatMessagesArea');
+      if (area) {
+        area.innerHTML = `
+          <div class="chat-msg assistant">
+            <div><strong>ᱡᱚᱦᱟᱨ (Johar)!</strong> Chat cleared. How can I help you in Class ${currentGrade || 3} today?</div>
+            <div class="chat-meta">
+              <span>🤖 J-Guruji Primary Assistant</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function testGroqApiKeyUI() {
+      const statusText = document.getElementById('chatStatusText');
+      if (statusText) statusText.innerText = 'Testing Models...';
+      try {
+        const res = await fetch(`${API_BASE}/api/ai/status`);
+        const data = await res.json();
+        if (statusText) statusText.innerText = '🟢 Online & Ready';
+
+        const conn = data.test_connection || {};
+        const it2 = data.indictrans2_santali_engine || {};
+        if (conn.status === 'SUCCESS') {
+          const sampleTrans = it2.test_results && it2.test_results[0] ? `\n• IndicTrans2 Test: "${it2.test_results[0].santali}" -> "${it2.test_results[0].translation}"` : '';
+          alert(`✅ Groq & IndicTrans2 AI Tested Successfully!\n\n• LLM Model: ${data.groq_model}\n• IndicTrans2 Translator: Active (Santali -> English)${sampleTrans}\n• Status: Ready to process Santali and English queries!`);
+        } else {
+          alert(`Notice on Groq API Key:\n\nStatus: ${conn.status}\nDetails: ${conn.message || 'Check network connectivity'}`);
+        }
+      } catch (err) {
+        if (statusText) statusText.innerText = '🟢 Local Engine Ready';
+        alert('Could not test API key endpoint: ' + err);
+      }
+    }
+
+    async function askDoubt() {
+      try {
+        const inputEl = document.getElementById('studentDoubtInput');
+        if (!inputEl) {
+          console.error("Input element studentDoubtInput not found");
+          return;
+        }
+        const q = inputEl.value.trim();
+        if (!q) return;
+
+        const chatArea = document.getElementById('chatMessagesArea');
+        const sendBtn = document.getElementById('chatSendBtn');
+        const statusText = document.getElementById('chatStatusText');
+
+        // Append user bubble to chatbox
+        if (chatArea) {
+          const userBubble = document.createElement('div');
+          userBubble.className = 'chat-msg user';
+          userBubble.innerHTML = `
+            <div>${escapeHtml(q)}</div>
+            <div class="chat-meta">
+              <span>🧑‍🎓 ${currentUser ? escapeHtml(currentUser.name || currentUser.identifier) : 'Student'}</span>
+            </div>
+          `;
+          chatArea.appendChild(userBubble);
+          inputEl.value = '';
+          chatArea.scrollTop = chatArea.scrollHeight;
+
+          // Append typing indicator
+          const typingBubble = document.createElement('div');
+          typingBubble.className = 'chat-msg assistant';
+          typingBubble.id = 'chatTypingBubble';
+          typingBubble.innerHTML = `
+            <div style="font-style: italic; color: var(--text-muted);">
+              🤔 Thinking and grounding in Class ${currentGrade || 3} syllabus...
+            </div>
+          `;
+          chatArea.appendChild(typingBubble);
+          chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        if (sendBtn) sendBtn.disabled = true;
+        if (statusText) statusText.innerText = '⚡ Generating reply...';
+
+        try {
+          const activeSubj = (typeof activeSubjectData !== 'undefined' && activeSubjectData && activeSubjectData.subject) ? activeSubjectData.subject.name : "Mathematics";
+          const activeChap = (typeof activeLessonData !== 'undefined' && activeLessonData && activeLessonData.chapter) ? activeLessonData.chapter.name : "Numbers & Operations";
+
+          const res = await fetch(`${API_BASE}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: q,
+              user_identifier: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.identifier : "student",
+              class_number: (typeof currentGrade !== 'undefined' && currentGrade) ? currentGrade : 3,
+              subject: activeSubj,
+              chapter: activeChap,
+              language: (typeof currentUser !== 'undefined' && currentUser && currentUser.preferred_language) ? currentUser.preferred_language : "Santali (English)",
+              history: chatConversationHistory
+            })
+          });
+
+          const data = await res.json();
+          const replyText = data.reply || "Sorry, I could not process your query.";
+          const engineSource = data.source === 'groq_cloud_llm' ? `⚡ Groq Cloud LLM (${data.model})` : '🏛️ J-Guruji Local Rules';
+
+          // Remove typing indicator
+          const tb = document.getElementById('chatTypingBubble');
+          if (tb) tb.remove();
+
+          // Append assistant reply bubble
+          if (chatArea) {
+            const assistantBubble = document.createElement('div');
+            assistantBubble.className = 'chat-msg assistant';
+            
+            if (data.santali_translation && data.santali_translation.english) {
+              const transDiv = document.createElement('div');
+              transDiv.style.cssText = 'font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; padding: 0.35rem 0.6rem; background: #F3F4F6; border-radius: 6px; border-left: 3px solid #B45309;';
+              transDiv.innerHTML = `<strong>🔄 IndicTrans2 (Santali &rarr; English):</strong> "${escapeHtml(data.santali_translation.english)}"`;
+              assistantBubble.appendChild(transDiv);
+            }
+
+            const textDiv = document.createElement('div');
+            textDiv.style.whiteSpace = 'pre-wrap';
+            textDiv.style.lineHeight = '1.6';
+            textDiv.textContent = replyText;
+            assistantBubble.appendChild(textDiv);
+
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'chat-meta';
+            const botLabel = document.createElement('span');
+            botLabel.textContent = `🤖 ${engineSource}`;
+            metaDiv.appendChild(botLabel);
+
+            const speakBtn = document.createElement('button');
+            speakBtn.className = 'btn btn-secondary';
+            speakBtn.style.cssText = 'padding: 0.15rem 0.5rem; font-size: 0.72rem;';
+            speakBtn.textContent = '🔊 Speak';
+            speakBtn.onclick = () => speakSantaliDirect(replyText);
+            metaDiv.appendChild(speakBtn);
+
+            assistantBubble.appendChild(metaDiv);
+            chatArea.appendChild(assistantBubble);
+            chatArea.scrollTop = chatArea.scrollHeight;
+          }
+
+          // Record history
+          chatConversationHistory.push({ role: 'user', content: q });
+          chatConversationHistory.push({ role: 'assistant', content: replyText });
+          if (chatConversationHistory.length > 10) chatConversationHistory = chatConversationHistory.slice(-10);
+
+          // Also update the fallback response area for compatibility
+          const respArea = document.getElementById('doubtResponseArea');
+          if (respArea) {
+            respArea.innerHTML = `
+              <div class="card" style="background: var(--surface-subtle); margin-top: 1rem;">
+                <h4>Assistant Explanation for Class ${currentGrade || 3}:</h4>
+                <p style="margin-top: 0.5rem; white-space: pre-wrap; line-height: 1.6;">${escapeHtml(replyText)}</p>
+              </div>
+            `;
+          }
+
+        } catch (err) {
+          const tb = document.getElementById('chatTypingBubble');
+          if (tb) tb.remove();
+
+          if (chatArea) {
+            const errBubble = document.createElement('div');
+            errBubble.className = 'chat-msg assistant';
+            errBubble.style.borderColor = '#FCA5A5';
+            errBubble.innerHTML = `
+              <div style="color: #DC2626;">Error reaching AI service: ${escapeHtml(String(err))}</div>
+            `;
+            chatArea.appendChild(errBubble);
+            chatArea.scrollTop = chatArea.scrollHeight;
+          }
+        } finally {
+          if (sendBtn) sendBtn.disabled = false;
+          if (statusText) statusText.innerText = '🟢 Online & Ready';
+        }
+      } catch (outerErr) {
+        console.error("askDoubt error:", outerErr);
+        const sendBtn = document.getElementById('chatSendBtn');
+        if (sendBtn) sendBtn.disabled = false;
+      }
     }
 
     // --- PROGRESS & SYNC ---
