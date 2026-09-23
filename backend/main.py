@@ -14,7 +14,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, F
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response
-from gtts import gTTS
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 import jwt
@@ -86,21 +86,45 @@ def get_localization(lang: Optional[str] = None):
 class TeacherRegisterRequest(BaseModel):
     name: str
     school: str
-    teacher_id: str
+    teacher_id: Optional[str] = None
+    identifier: Optional[str] = None
+    id: Optional[str] = None
     password: str
     preferred_language: str = "Hindi"
+
+    @property
+    def resolved_teacher_id(self) -> str:
+        tid = self.teacher_id or self.identifier or self.id or ""
+        return tid.strip()
 
 class StudentRegisterRequest(BaseModel):
     name: str
     school: str
-    student_id: str
+    student_id: Optional[str] = None
+    identifier: Optional[str] = None
+    id: Optional[str] = None
     password: str
     class_number: int = 3
     preferred_language: str = "Santali"
 
+    @property
+    def resolved_student_id(self) -> str:
+        sid = self.student_id or self.identifier or self.id or ""
+        return sid.strip()
+
 class LoginRequest(BaseModel):
-    identifier: str
+    identifier: Optional[str] = None
+    student_id: Optional[str] = None
+    teacher_id: Optional[str] = None
+    id: Optional[str] = None
+    username: Optional[str] = None
     password: str
+
+    @property
+    def resolved_identifier(self) -> str:
+        ident = self.identifier or self.student_id or self.teacher_id or self.id or self.username or ""
+        return ident.strip()
+
 
 class TranslateRequest(BaseModel):
     text: str
@@ -185,15 +209,19 @@ class SyncRequest(BaseModel):
 
 @app.post("/auth/teacher/register")
 def register_teacher(req: TeacherRegisterRequest, db: Session = Depends(get_db)):
-    existing = db.query(User).filter_by(identifier=req.teacher_id).first()
+    tid = req.resolved_teacher_id
+    if not tid:
+        raise HTTPException(status_code=400, detail="Teacher ID is required")
+
+    existing = db.query(User).filter(func.lower(User.identifier) == tid.lower()).first()
     if existing:
         raise HTTPException(status_code=400, detail="Teacher ID already registered")
 
     user = User(
         role="teacher",
-        identifier=req.teacher_id,
-        name=req.name,
-        school=req.school,
+        identifier=tid,
+        name=req.name.strip(),
+        school=req.school.strip(),
         password_hash=hash_password(req.password),
         preferred_language=req.preferred_language
     )
@@ -201,7 +229,7 @@ def register_teacher(req: TeacherRegisterRequest, db: Session = Depends(get_db))
     db.commit()
     db.refresh(user)
 
-    profile = TeacherProfile(user_id=user.id, teacher_id=req.teacher_id)
+    profile = TeacherProfile(user_id=user.id, teacher_id=tid)
     db.add(profile)
     db.commit()
 
@@ -222,7 +250,21 @@ def register_teacher(req: TeacherRegisterRequest, db: Session = Depends(get_db))
 
 @app.post("/auth/teacher/login")
 def login_teacher(req: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(identifier=req.identifier, role="teacher").first()
+    ident = req.resolved_identifier
+    if not ident:
+        raise HTTPException(status_code=400, detail="Teacher ID / Identifier is required")
+
+    user = db.query(User).filter(
+        func.lower(User.identifier) == ident.lower(),
+        User.role == "teacher"
+    ).first()
+
+    # Fallback to teacher_profiles table if needed
+    if not user:
+        t_prof = db.query(TeacherProfile).filter(func.lower(TeacherProfile.teacher_id) == ident.lower()).first()
+        if t_prof:
+            user = db.query(User).filter(User.id == t_prof.user_id, User.role == "teacher").first()
+
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid teacher credentials")
 
@@ -230,6 +272,7 @@ def login_teacher(req: LoginRequest, db: Session = Depends(get_db)):
     return {
         "status": "SUCCESS",
         "access_token": token,
+        "token_type": "bearer",
         "user": {
             "id": user.id,
             "role": user.role,
@@ -242,15 +285,19 @@ def login_teacher(req: LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/auth/student/register")
 def register_student(req: StudentRegisterRequest, db: Session = Depends(get_db)):
-    existing = db.query(User).filter_by(identifier=req.student_id).first()
+    sid = req.resolved_student_id
+    if not sid:
+        raise HTTPException(status_code=400, detail="Student ID is required")
+
+    existing = db.query(User).filter(func.lower(User.identifier) == sid.lower()).first()
     if existing:
         raise HTTPException(status_code=400, detail="Student ID already registered")
 
     user = User(
         role="student",
-        identifier=req.student_id,
-        name=req.name,
-        school=req.school,
+        identifier=sid,
+        name=req.name.strip(),
+        school=req.school.strip(),
         password_hash=hash_password(req.password),
         preferred_language=req.preferred_language
     )
@@ -258,7 +305,7 @@ def register_student(req: StudentRegisterRequest, db: Session = Depends(get_db))
     db.commit()
     db.refresh(user)
 
-    profile = StudentProfile(user_id=user.id, student_id=req.student_id, class_number=req.class_number)
+    profile = StudentProfile(user_id=user.id, student_id=sid, class_number=req.class_number)
     db.add(profile)
     db.commit()
 
@@ -266,6 +313,7 @@ def register_student(req: StudentRegisterRequest, db: Session = Depends(get_db))
     return {
         "status": "SUCCESS",
         "access_token": token,
+        "token_type": "bearer",
         "user": {
             "id": user.id,
             "role": user.role,
@@ -279,7 +327,22 @@ def register_student(req: StudentRegisterRequest, db: Session = Depends(get_db))
 
 @app.post("/auth/student/login")
 def login_student(req: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(identifier=req.identifier, role="student").first()
+    ident = req.resolved_identifier
+    if not ident:
+        raise HTTPException(status_code=400, detail="Student ID / Identifier is required")
+
+    # Match User by identifier (case-insensitive) with role check
+    user = db.query(User).filter(
+        func.lower(User.identifier) == ident.lower(),
+        User.role == "student"
+    ).first()
+
+    # Fallback: check StudentProfile student_id if identifier was different
+    if not user:
+        s_prof = db.query(StudentProfile).filter(func.lower(StudentProfile.student_id) == ident.lower()).first()
+        if s_prof:
+            user = db.query(User).filter(User.id == s_prof.user_id, User.role == "student").first()
+
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid student credentials")
 
@@ -288,6 +351,7 @@ def login_student(req: LoginRequest, db: Session = Depends(get_db)):
     return {
         "status": "SUCCESS",
         "access_token": token,
+        "token_type": "bearer",
         "user": {
             "id": user.id,
             "role": user.role,

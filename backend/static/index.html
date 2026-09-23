@@ -479,7 +479,7 @@
       <!-- STUDENT AUTH -->
       <div id="studentAuthSection" style="display: none;">
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
-          <button class="btn btn-secondary" id="btnStudentToggleLogin" style="flex: 1;" onclick="setStudentAuthMode('login')">Login</button>
+          <button class="btn" id="btnStudentToggleLogin" style="flex: 1;" onclick="setStudentAuthMode('login')">Login</button>
           <button class="btn btn-secondary" id="btnStudentToggleReg" style="flex: 1;" onclick="setStudentAuthMode('register')">New User (Register)</button>
         </div>
 
@@ -1116,7 +1116,7 @@
         "online_status": "🟢 ᱚᱱᱞᱟᱭᱤᱱ • ᱥᱤᱝᱠ ᱟᱠᱟᱱᱟ (Online • Synced)",
         "offline_status": "🟡 ᱚᱯᱷᱞᱟᱭᱤᱱ ᱢᱳᱰ (Offline Mode Active)",
         "not_logged_in": "ᱵᱟᱢ ᱵᱚᱞᱚ ᱟᱠᱟᱱᱟ (Not Logged In)",
-        "welcome_user": "ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ, {name} (Welcome, {name})",
+        "welcome_user": "ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ, {name}",
         "sign_out": "ᱵᱟᱦᱨᱮ ᱚᱰᱚᱠ (Sign Out)",
         "auth_welcome_title": "ᱥᱟᱹᱜᱩᱱ ᱫᱟᱨᱟᱢ (Welcome)",
         "auth_welcome_sub": "ᱟᱢᱟᱜ ᱮᱠᱟᱣᱩᱱᱴ ᱛᱮ ᱵᱚᱞᱚᱱ ᱢᱮ ᱥᱮ ᱱᱟᱶᱟ ᱩᱯᱨᱩᱢ ᱵᱮᱱᱟᱣ ᱢᱮ (Sign in or create account)",
@@ -1187,7 +1187,7 @@
         "online_status": "🟢 ऑनलाइन • सिंक संपन्न (Online • Synced)",
         "offline_status": "🟡 ऑफ़लाइन मोड (Offline Mode Active)",
         "not_logged_in": "लॉग इन नहीं हैं (Not Logged In)",
-        "welcome_user": "स्वागत है, {name} (Welcome, {name})",
+        "welcome_user": "स्वागत है, {name}",
         "sign_out": "साइन आउट (Sign Out)",
         "auth_welcome_title": "स्वागत है (Welcome)",
         "auth_welcome_sub": "अपने खाते से लॉग इन करें या नया प्रोफ़ाइल बनाएं (Sign in or create account)",
@@ -1503,7 +1503,9 @@
       const t_tprof = document.getElementById('tabTeacher_profile');
       if (t_tprof) t_tprof.innerText = d.profile_tab;
 
-      // Student Home Screen
+      // Teacher & Student Home Screen
+      const thw = document.getElementById('teacherHomeWelcome');
+      if (thw && currentUser) thw.innerText = d.welcome_user.replace('{name}', currentUser.name);
       const shw = document.getElementById('studentHomeWelcome');
       if (shw && currentUser) shw.innerText = d.welcome_user.replace('{name}', currentUser.name);
     }
@@ -1611,15 +1613,15 @@
     }
 
     async function loginStudent() {
-      const id = document.getElementById('studentIdInput').value.trim();
-      const pwd = document.getElementById('studentPwdInput').value.trim();
+      const id = (document.getElementById('studentIdInput').value || '').trim();
+      const pwd = (document.getElementById('studentPwdInput').value || '').trim();
       if (!id || !pwd) { alert('Please enter both Student ID and password.'); return; }
 
       try {
         const res = await fetch(`${API_BASE}/auth/student/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier: id, password: pwd })
+          body: JSON.stringify({ identifier: id, student_id: id, password: pwd })
         });
         const data = await res.json();
         if (res.ok) {
@@ -1636,11 +1638,11 @@
     }
 
     async function registerStudent() {
-      const name = document.getElementById('regStudentName').value.trim();
-      const school = document.getElementById('regStudentSchool').value.trim();
-      const id = document.getElementById('regStudentId').value.trim();
-      const pwd = document.getElementById('regStudentPwd').value.trim();
-      const cls = parseInt(document.getElementById('regStudentClass').value);
+      const name = (document.getElementById('regStudentName').value || '').trim();
+      const school = (document.getElementById('regStudentSchool').value || '').trim();
+      const id = (document.getElementById('regStudentId').value || '').trim();
+      const pwd = (document.getElementById('regStudentPwd').value || '').trim();
+      const cls = parseInt(document.getElementById('regStudentClass').value) || 3;
       const lang = document.getElementById('regStudentLang').value;
 
       if (!name || !school || !id || !pwd) { alert('Please fill in all registration fields.'); return; }
@@ -1649,10 +1651,14 @@
         const res = await fetch(`${API_BASE}/auth/student/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, school: school, student_id: id, password: pwd, class_number: cls, preferred_language: lang })
+          body: JSON.stringify({ name: name, school: school, student_id: id, identifier: id, password: pwd, class_number: cls, preferred_language: lang })
         });
         const data = await res.json();
         if (res.ok) {
+          // Pre-populate login form fields so if user logs out, their ID is already ready
+          const sIdInput = document.getElementById('studentIdInput');
+          if (sIdInput) sIdInput.value = id;
+
           currentUser = data.user;
           currentGrade = cls;
           localStorage.setItem('vernacular_current_user', JSON.stringify(currentUser));
